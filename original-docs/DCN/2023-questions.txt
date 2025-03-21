@@ -1,0 +1,199 @@
+University of Sri Jayewardenepura
+
+M.Sc. in Computer Science
+
+First Semester Course Unit Examination — August 2023
+CSC 543 2.0 Data Communication and Networking
+
+Time: Two (02) Hours
+This paper consists of 4 questions on 3 pages. Answer all questions.
+
+Question 01.
+
+(A total of 25 marks)
+
+(a) Assume that you are watching a movie stored in a server in America using your mobile
+
+phone. With regard to data communication and networking, answer the following
+questions.
+
+(i)
+
+Drawa sketch of a possible network diagram and name four possible network
+types.
+
+.
+
+(ii) Name three possible data communication mediums involved in the above
+scenario and explain a strength and a weakness of each.
+
+(iii) Name three networking protocols involved in the above scenario and explain
+their responsibilities in brief.
+
+[09 Marks]
+
+(b)
+
+Why do we have layered the networking functionalities? Name three layers of TCP/IP
+five-layer model and explain their role in brief.
+[09 Marks]
+
+(c) In different networking layers, different terms are being used to refer to the data being
+transport. Name the terms that are being used in TCP/IP five-layer model. Moreover,
+
+what do you mean by encapsulation and decapsulation in networking? Why do we have
+encapsulation and decapsulation in networking devices such as switches and routers.
+
+[07 Marks]
+
+Page 1 of 3
+
+Question 02.
+
+(A total of25 marks)
+
+(a) If two nodes with different communication speeds and finite buffers need to have
+
+a
+reliable and efficient communication over a noisy channel, answer the following
+questions. You may use diagrams where necess
+ary.
+(i) Identify two possible issues that can occur due to the noises
+in the
+communication channel.
+
+(ii) Explain how you can solve the above (i) issues.
+(iii) The above (ii) simplest solution can slow down the
+
+communication speed.
+
+Hence, suggest a mechanism to make it more efficien
+
+t while guaranteeing a
+
+solution to the original problem.
+
+[08 Marks]
+
+(b)
+
+If the traffic of a communication channel change
+
+s dynamically, how can the data
+
+sending node know traffic and adjust its sendin
+
+g speed accordingly?
+
+.
+(c)
+
+[04 Marks]
+
+Name and briefly explain three channelizing metho
+
+ds that can be used to share a
+
+communication channel among multip
+
+le nodes.
+
+,
+[06
+
+(d) Consider the following codeword 1011011. If
+
+the Hamming (7,4) with even parity has
+
+been used, answer the following questions.
+(i)
+
+Marks]
+
+Is the codeword correct? Justify your answer.
+
+(ii) If the answer for the (i) is no,
+a)
+
+How many errors are there?
+
+b)
+
+Can you correct them? Justify your answer.
+[07 Marks]
+
+Question 03.
+
+(4 total of 25 marks)
+
+(a) When a user types “http://www.graduate.sjp.ac.
+
+Ik/” in the address bar ofa web browser,
+browser is able to contact the right webserver and
+retrieve the relevant content from it.
+
+By showing all the major steps, clearly explain
+
+on the internet to retrieve the content.
+
+how a web browser finds the right server
+
+[12 Marks]
+
+(b) If three live websites have been opened in three
+
+tabs of a browser, explain how the right
+
+content goes to the right tab. Moreover, if multip
+
+same online shopping site, how can the server
+
+le users are concurrently accessing the
+
+send right content to the right user?
+
+[13 Marks]
+
+Page 2 of 3
+
+Question 04. (A total of 25 marks)
+
+(a) Using a suitable single source shortest path routing algorithm, find the final routing
+table of node A of the following network diagram. All the intermediate steps need to
+be shown clearly.
+
+[13 Marks]
+
+‘
+
+(b) Assume that a university has four faculties namely Science, Engineering, Medical,
+and Commers. The number of computers in each faculty is about 700, 450, 250, and
+
+1000 respectively. Moreover, the Science faculty has three departments with
+computer laboratories namely Computer Science, Mathematics, and Statistics. There
+are about 300, 125, and 118 computers in those departments respectively. If one of
+the computers in university has the 19.163.182.146/20 IP address, answer the
+following questions. You may assume that the subnetworks have ordered
+
+(descending) according to the number of computers in each and only the minimum
+
+required number of IP addresses need to be given for each faculty and department
+(Whatever left need to be preserved for future use).
+
+(i)
+
+What is the subnet mask of the Medical faculty?
+
+(ii) What is the network address of the subnet that the above IP address is belong
+to?
+
+(iii) What is the last usable IP address of the above (ii) subnet?
+[12 Marks]
+
+* * * * END OF PAPER *
+
+* * *
+
+Page 3 of 3
+
+

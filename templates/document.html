@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title.replace('-', ' ').title() }} - Study Buddy{% endblock %}
+
+{% block content %}
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <h1 class="mb-0">{{ title.replace('-', ' ').title() }}</h1>
+    <div class="reading-controls">
+        <div class="btn-group" role="group">
+            <button id="zoom-out" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-search-minus"></i>
+            </button>
+            <button id="zoom-reset" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-sync-alt"></i> Reset
+            </button>
+            <button id="zoom-in" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-search-plus"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<article class="markdown-content" id="markdown-content">
+    {{ content | safe }}
+</article>
+
+<div id="mermaid-fallback-container" style="display: none;">
+    <div class="alert alert-warning alert-dismissible fade show mt-4" role="alert">
+        <strong><i class="fas fa-exclamation-triangle me-2"></i>Diagram rendering issue detected!</strong> Some complex diagrams may not render correctly.
+        <button id="try-fallback" type="button" class="btn btn-sm btn-primary ms-3">
+            <i class="fas fa-sync-alt me-1"></i>Try Alternative Renderer
+        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+
+<script>
+    // Re-initialize Mermaid for this specific document
+    document.addEventListener("DOMContentLoaded", function() {
+        // Find all mermaid divs
+        const mermaidDivs = document.querySelectorAll('.mermaid');
+        
+        // Debug output
+        console.log("Found " + mermaidDivs.length + " mermaid diagrams");
+        
+        if (mermaidDivs.length > 0) {
+            // Log the content of diagrams for debugging
+            mermaidDivs.forEach((div, index) => {
+                console.log(`Diagram ${index} content:`, div.textContent.trim().substring(0, 100) + "...");
+            });
+            
+            // Make sure mermaid is loaded before initializing
+            if (typeof mermaid !== 'undefined') {
+                try {
+                    // Reset mermaid to make sure we're using a fresh instance
+                    mermaid.initialize({ theme: 'neutral' }); // Ensure neutral theme
+                    mermaid.init(undefined, document.querySelectorAll(".mermaid"));
+                    
+                    // Check for render errors after a slight delay
+                    setTimeout(function() {
+                        const errorDivs = document.querySelectorAll('.mermaid svg.error');
+                        if (errorDivs.length > 0 || document.querySelectorAll('.mermaid:empty').length > 0) {
+                            console.log("Mermaid rendering errors detected");
+                            document.getElementById('mermaid-fallback-container').style.display = 'block';
+                        }
+                    }, 1000);
+                } catch (e) {
+                    console.error("Mermaid initialization error:", e);
+                    document.getElementById('mermaid-fallback-container').style.display = 'block';
+                }
+            } else {
+                console.error("Mermaid library not loaded!");
+                document.getElementById('mermaid-fallback-container').style.display = 'block';
+            }
+        }
+        
+        // Add click handler for the fallback renderer button
+        document.getElementById('try-fallback').addEventListener('click', function() {
+            const mermaidDivs = document.querySelectorAll('.mermaid');
+            
+            mermaidDivs.forEach(function(div) {
+                const content = div.textContent.trim();
+                console.log("Using fallback for diagram:", content.substring(0, 100) + "...");
+                
+                // Make API call to the fallback renderer
+                fetch('/render-mermaid', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({diagram: content}),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Create an image element with the SVG URL
+                    div.innerHTML = `<img src="${data.svg_url}" alt="Mermaid Diagram" class="img-fluid">`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    div.innerHTML = `<div class="alert alert-danger">Failed to render diagram</div>`;
+                });
+            });
+        });
+        
+        // Reading experience enhancement
+        let fontSize = 16;
+        const content = document.getElementById('markdown-content');
+        
+        // Font size controls
+        document.getElementById('zoom-in').addEventListener('click', function() {
+            fontSize += 2;
+            content.style.fontSize = fontSize + 'px';
+        });
+        
+        document.getElementById('zoom-out').addEventListener('click', function() {
+            if (fontSize > 12) {
+                fontSize -= 2;
+                content.style.fontSize = fontSize + 'px';
+            }
+        });
+        
+        document.getElementById('zoom-reset').addEventListener('click', function() {
+            fontSize = 16;
+            content.style.fontSize = '';
+        });
+    });
+</script>
+
+<style>
+    .dark-mode .markdown-content {
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    
+    .dark-mode .markdown-content a {
+        color: #79b8ff;
+    }
+    
+    .dark-mode .markdown-content h1, 
+    .dark-mode .markdown-content h2, 
+    .dark-mode .markdown-content h3, 
+    .dark-mode .markdown-content h4, 
+    .dark-mode .markdown-content h5, 
+    .dark-mode .markdown-content h6 {
+        color: #98d8aa;
+    }
+    
+    .dark-mode .markdown-content code {
+        background-color: #3a3a3a;
+        color: #ff7b72;
+    }
+    
+    .dark-mode .markdown-content pre {
+        background-color: #3a3a3a;
+    }
+    
+    /* Ensure consistent mermaid diagram colors in dark mode */
+    .dark-mode .mermaid .node rect,
+    .dark-mode .mermaid .node circle,
+    .dark-mode .mermaid .node polygon,
+    .dark-mode .mermaid .node path {
+        stroke: #98d8aa !important;
+    }
+    
+    .dark-mode .mermaid .node.default > rect,
+    .dark-mode .mermaid .node.default > circle,
+    .dark-mode .mermaid .node.default > polygon {
+        fill: #2a2a2a !important;
+    }
+    
+    .dark-mode .mermaid .nodeLabel {
+        color: #f0f0f0 !important;
+    }
+    
+    .dark-mode .mermaid .edgePath .path {
+        stroke: #98d8aa !important;
+    }
+    
+    .dark-mode .mermaid .edgeLabel {
+        background-color: #2a2a2a !important;
+        color: #f0f0f0 !important;
+    }
+    
+    .markdown-content {
+        line-height: 1.7;
+        transition: font-size 0.2s, background-color 0.3s, color 0.3s;
+    }
+    
+    .reading-controls {
+        transition: opacity 0.3s;
+    }
+</style>
+{% endblock %} 

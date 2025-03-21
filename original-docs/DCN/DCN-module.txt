@@ -1,0 +1,188 @@
+Title of the module: Data communication and Networking.
+Key areas and words/areas/titles in the module:
+ARPANET
+NSFNET
+TELENET
+Applications
+Other Benefits of computer network
+Disadvantages of computer networking
+Telephone network and GSM
+Types of networks { WAN, MAN, CAN, LAN, WLAN, PAN, BAN, SAN, POLAN,EPN, VPN}
+Distinguish between LAN,WAN,MAN
+Half duplex and full duplex
+Packet-switched networks {Datagram, virtual circuit network}
+FDM and TDM
+FDMA, TDMA, CDMA
+CDMA Encode/Decode
+phase-shift keying(PSK)
+Wave length Division Multiple Access
+Space Division Multiple Access
+Pure Aloha
+Pure(unslotted) Aloha
+Pure aloha Efficiency
+Slotted Aloha
+Pure aloha vs slotted aloha
+Contention-based network access
+Carrier sense multiple access
+CSMA/CD
+Collision detection in a wired network
+Collision detection in a wireless network
+"Taking Turns" Mac protocol
+Hidden node problem
+Expose Terminal Problem
+RTS/CTS
+Circuit Switching
+Seven layers of OSI model
+Wave
+Periodic and Aperiodic signals
+Bandwith-limited signals
+Baseband vs Broadband
+Transmission and reception  flow
+Modems
+Multiplexing and demultiplexing
+Manchester Encoding
+NZR
+Baud rate vs Bit rate
+Measuring data carrying capacity { Bandwidth, Thhroughput, Goodput }
+Maximum data rate of a channel
+Coax, Twisted pair, fiber optics
+Electro magnetic Spectrum
+THe politics of the electromagnetic spectrum
+Radio transmission
+Light transmission
+Low-earth orbit satellites iridium
+Globalstar
+The public switched telephone network
+telephone modems
+The telephone local loop: modems
+repeaters
+bridges
+routers
+guided transmission media
+magnetic media
+magnetic tapes
+power lines
+common bandwidths
+Ethernet
+connectors
+comparison of network cables
+gateways
+The data link layer
+layer 2 addressing
+service provider to network layer
+Where is the link layer implemented?
+service provider to network layer
+packet and frame
+framing
+framing methods
+a frame in a character-oriented protocol
+framing-byte count
+byte stuffing and unstuffing
+error and flow control
+noiseless channels
+An unrestricted simplex protocol
+the design of the simplest protocol with no flow or error control
+sender-site algorithm for the simplest protocol
+receiver-site algorithm for the simplest protocol
+flow diagram
+A simple stop-and-wait protocol
+design of stop-and-wait protocol
+sender-site algorithm for stop-and-wait protocol
+Receiver-site algorithm for stop-and-waite
+Noisy channels
+automatic repeat request(arq)
+Design of the stop-and-wait ARQ protocol
+sender-site algorithm for stop-and-wait ARQ protocol
+Receiver-site algorithm for stop-and-waite ARQ protocol
+Sliding window protocol { On-bit sliding, Go back N, Selective repeat }
+Go-back-N sender algorithm
+Go-back-n receiver algorithm
+Error detection and correction
+Error detecting codes
+Vertical redundancy check (vrc)
+Parity bit
+checksum
+cyclic redundancy checks(CRCs)
+GRC generator polynomials
+Cyclic redundancy checks
+Hamming code
+Network layer: Subnetting
+What is an IP address
+Dotted Decimal Notation
+Network prefix and Host number
+The old ways: Classful IP address
+Finding the class in binary notation
+Netid and Hostid
+classes
+sunetting
+basic idea of subnetting
+subnet masks
+a network with two level of hierachy( not subnetting)
+A network with three level of hierachy (subnetted)
+variable-length subnetting
+numbers of addresses in a book
+Beginning address
+CIDR - Classes interdomain routing
+CIDR and address routing
+What is suppernetting
+What is routing
+IP routing
+Routing protocol
+Design goals of routing
+Routing Metrics
+Global Dynamic routing
+Routing Algorithm types
+Inter domain vs intra-domain routing
+Adaptive vs non-adaptive routing
+Static or dynamic routing
+flooding
+routing vs flooding
+Global or decentralized
+Disstance vector vs Link State
+Single-source shortest paths
+Distance vector routing
+Bellman ford's algorithm
+Count to infinity problem
+Link state routing
+Dijkstra's allgorithm
+Increasing network size
+Hierarchical routing
+Peanalty for Hierarchical routing
+Hierarchical OSPF
+Internet control protocols { RIP, OSPF, IGRP, EGP, BGP }
+Relationship of layers and addresses in TCP/IP
+Multiplexing and Demultiplexing in Transport layer
+Sockets
+Connectionless Demux
+Connection oriented demultiplexing
+TCP/UDP Segment format
+TCP flow control and Beyond
+TCP Congestion control
+Establishing a TCP 3 way Handshale
+Closing TCP Connections: TCP 4 way handshake
+TCP Segment structure
+TCP Retransmission
+How to Estimate RTT
+Client -  server architecture
+peer to peer architecture
+UDP segment header
+QUIC
+HTTP
+IP headers
+HTTP Request message
+HTTPS Handshake
+DNS Services
+HTTP response status codes
+HTTPS
+DNS is a Distributed and Hierarchical databse
+Authoritative DNS servers
+Local DNS Name servers
+URL -> ip
+DNS protocol message
+ARP
+DNS name resolution: recursive query
+DNS pROTOCOL message
+MAC address learning process
+DORA
+ICMP and PING
+

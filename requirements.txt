@@ -1,0 +1,7 @@
+flask==3.0.2
+markdown==3.5.2
+python-frontmatter==1.0.0
+watchdog==4.0.0
+pymdown-extensions==10.7
+python-markdown-math==0.8
+gunicorn==21.2.0 

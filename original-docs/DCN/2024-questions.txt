@@ -1,0 +1,241 @@
+S80
+
+University of Sri
+
+Jayewardenepura
+
+M.Sc. in Computer Science
+
+First Semester Course UnitIExamination — April/May 2024
+CSC 543 2.0 Data Communication and Networking
+Time: Two (02) Hours
+
+This paper consists of 4 questions on 3 pages. Answer all questions.
+Whenever possible, write your answers in point form (concisely).
+s
+
+Question 01.
+
+(A total of 25 marks)
+
+(a) Clearly explain the following terms and their role/usagein data communication and
+networking.
+“G)
+
+BAN
+
+(ii) Bandwidth
+
+(iil) Datagrams
+
+_
+
+Civ) Core Network
+
+Oe
+
+ee
+
+Boe
+
+j
+
+_+(v) Microwaves
+[02x5 Marks]
+
+©
+
+(b) Briefly explain the major functionalities of the following layers in
+i TCP/IP five-layer
+sniodel in
+i computer networking.
+‘
+
+(i) Data link layer
+
+‘
+
+Gi) Transport layer
+‘
+
+hag. 3
+
+(iii)Networking layer
+[03x3 Marks]
+
+(ce)
+
+Briefly explain the role/responsibilities of the following networking protocols.
+(i)
+
+DNS
+
+(ii) IMAP
+J
+
+(iii) ARP
+
+(iv) ICMP
+[01x4 Marks]
+
+‘ (d) Write the following IPv6 address in the simplified way.
+“
+
+4002 : 00A3 : 0000 : 0000 : 0000 : 004D : 0000 : O9FB
+[02 Marks]
+
+em
+. Page 1 of 3
+
+Question 02.
+
+(4 total of 25 marks)
+
+/
+
+{a)
+
+Assume that two nodes with different communication speeds and finite buffers need
+to communicate over a noiseless channel efficiently and reliably. Identify possible
+
+issues that can occur in the above scenario and suggest suitable techniques that can
+
+be used to address those issues. You may use diagrams where necessary.
+
+[07 Marks]
+
+(b) Name three random access protocols that can be used to access
+medium and compare their pros and cons.
+
+a communication
+
+-[02x3 Marks]
+(c) If the following bits need to be transferred via a noisy
+
+communication channel, find the
+checksum value that need be sent together with the data
+to detect its correctness at the
+receiving end.
+"s
+10011010 11010101 01011100 10010001
+
+[06 Marks]
+(d) What is multiplexing and demultiplexing in comput
+
+er networking? Using a suitable
+example, explain how multiplexing and demultiplexi
+ng are being used in computer
+
+_ networks.
+
+er SR
+
+Question 03.
+
+ene
+
+[06 Marks], =
+
+(4 total of 25 marks)
+
+—
+
+(a) Briefly explain the “Hidden node problem”
+and the “Exposed node problem” in
+
+networking.
+
+[03x2 Marks]
+
+1
+
+-
+
+(b) Name three connecting devices used in three differe
+
+nt layers of computer networks.
+Further, explain their major responsibilities in the respect
+ive layer together with the
+types of data and addressing they are handling.
+
+[03x3 Marks]
+
+(c) If multiple users are simultaneously accessing a websit
+
+e, how can the right content go
+
+to the right user? Clearly explain how the compu
+ter networks address the above
+requirement.
+
+[10 Marks]
+
+|
+
+j|
+
+Page 2 of 3
+
+r
+
+Question 04. (4 total of 25 marks)
+
+Aa)
+
+Using a suitable rapidly converging single source shortest path routing algorithm, find
+the final routing table of node A of the following network diagram. All the
+intermediate steps need to be shown clearly.
+
+[12 Marks]
+
+“(b)
+
+An ISPis given a public IP range to serve its clients in
+1 the mosteffectivemannerss=—=——=—————
+
+______ TheISP.has divided -its-clients-intothret Tain
+ma groupss namely AA, B, and C where
+Clientsjin each subnetwork of the above groups can facilitate 2000, 1000, and 200
+computers accessing the network respectively. Group A consumes half of the ISPs
+
+original address space and Group B, and C equally consume the rest. Further, the
+
+address space of each main group is again divided into three subgroups X, Y, and Z,
+_ where each ‘can facilitate half (1/2), quarter (1/4), and one eighth (1/8) of its main
+groups address space. (eg: if ISPs original address space consists of n number of IP
+
+addresses, Group B, represents n/4 addresses and Subgroup B;Z; represents n/32
+
+addresses; where i, and j are the indexes (zero- based) of groups and subgroups
+respectively)
+If one of the IPs of ISP is 143.16.23.175, and the address spaces are divided according
+
+to the alphabetical order, answer the following questions. Moreover, you may assume
+that the ISP’s subnet mask is /19.
+
+(i) How many subnetworks can be defined under the Group B (B;s)?
+(ii) What is the subnet mask of C3 (zero-based indexing) sub network?
+
+(iii) What is the network address (Subgroup)
+
+of the
+
+subnetwork that the
+
+143.16.23.175 IP address is belong to?
+
+(iv) What is the subnet mask of the above (iii) subnetwork?
+(v)
+
+What is the last usable IP address of the above (iii) subnetwork?
+
+[13 Marks]
+
+* * * *
+
+END OF PAPER * * * *
+
+wake
+Page 3 of 3
+
+
