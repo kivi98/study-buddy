@@ -274,6 +274,282 @@ graph LR
      ```
 </details>
 
+## Transaction Isolation Levels
+
+<div title="Isolation levels determine how transaction integrity is visible to other users and systems">
+Transaction isolation levels define the degree to which the operations in one transaction are isolated from operations in other concurrent transactions.
+</div>
+
+### Isolation Levels Comparison
+```mermaid
+graph TD
+    subgraph Isolation Levels
+        A[Read Uncommitted] --> B[Read Committed]
+        B --> C[Repeatable Read]
+        C --> D[Serializable]
+    end
+    
+    subgraph Isolation Problems
+        E[Dirty Read]
+        F[Non-repeatable Read]
+        G[Phantom Read]
+    end
+    
+    A --"Allows"--> E & F & G
+    B --"Prevents"--> E
+    B --"Allows"--> F & G
+    C --"Prevents"--> E & F
+    C --"Allows"--> G
+    D --"Prevents"--> E & F & G
+    
+    style A fill:#fdd,stroke:#333,stroke-width:2px
+    style B fill:#fdb,stroke:#333,stroke-width:2px
+    style C fill:#dfd,stroke:#333,stroke-width:2px
+    style D fill:#bbf,stroke:#333,stroke-width:2px
+    style E fill:#f9f,stroke:#333,stroke-width:2px
+    style F fill:#f9f,stroke:#333,stroke-width:2px
+    style G fill:#f9f,stroke:#333,stroke-width:2px
+```
+
+<details>
+<summary><strong>Isolation Levels and Concurrency Phenomena</strong></summary>
+
+1. **Read Uncommitted**
+   - Lowest isolation level
+   - Allows dirty reads
+   - Example:
+     ```sql
+     SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+     BEGIN TRANSACTION;
+       -- Can see uncommitted changes from other transactions
+       SELECT * FROM accounts;
+     COMMIT;
+     ```
+
+2. **Read Committed**
+   - Prevents dirty reads
+   - Allows non-repeatable reads and phantom reads
+   - Example:
+     ```sql
+     SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+     BEGIN TRANSACTION;
+       -- Only sees committed changes
+       -- May see different results if query repeated
+       SELECT * FROM accounts;
+     COMMIT;
+     ```
+
+3. **Repeatable Read**
+   - Prevents dirty reads and non-repeatable reads
+   - Allows phantom reads
+   - Example:
+     ```sql
+     SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+     BEGIN TRANSACTION;
+       -- Same result if query repeated
+       -- But might see new rows (phantoms)
+       SELECT * FROM accounts WHERE balance > 1000;
+     COMMIT;
+     ```
+
+4. **Serializable**
+   - Highest isolation level
+   - Prevents all concurrency phenomena
+   - Example:
+     ```sql
+     SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+     BEGIN TRANSACTION;
+       -- Complete isolation
+       -- Most consistent but lowest concurrency
+       SELECT * FROM accounts WHERE balance > 1000;
+     COMMIT;
+     ```
+
+5. **Concurrency Phenomena**
+   - **Dirty Read**: Reading uncommitted changes
+   - **Non-repeatable Read**: Getting different values on re-read
+   - **Phantom Read**: Seeing new rows on re-execution of query
+</details>
+
+### Isolation Levels Performance Impact
+
+| Isolation Level | Concurrency | Overhead | Typical Use Case |
+|-----------------|-------------|----------|------------------|
+| **Read Uncommitted** | Highest | Lowest | Report generation, approximate counts |
+| **Read Committed** | High | Low | General OLTP, most applications |
+| **Repeatable Read** | Medium | Medium | Financial calculations, consistent reporting |
+| **Serializable** | Lowest | Highest | Critical financial transactions, regulatory compliance |
+
+### Isolation Level Examples
+
+**Read Uncommitted (Dirty Read):**
+```sql
+-- Transaction 1
+BEGIN TRANSACTION;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+-- Not yet committed
+
+-- Transaction 2 (using Read Uncommitted)
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+BEGIN TRANSACTION;
+SELECT balance FROM accounts WHERE id = 1;
+-- Will see the uncommitted balance (-100)
+COMMIT;
+
+-- Transaction 1 rolls back
+ROLLBACK;
+-- Transaction 2 used a value that never actually existed
+```
+
+**Non-repeatable Read:**
+```sql
+-- Transaction 1 (using Read Committed)
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+BEGIN TRANSACTION;
+SELECT balance FROM accounts WHERE id = 1;
+-- Returns 1000
+
+-- Transaction 2
+BEGIN TRANSACTION;
+UPDATE accounts SET balance = 900 WHERE id = 1;
+COMMIT;
+
+-- Transaction 1 continues
+SELECT balance FROM accounts WHERE id = 1;
+-- Returns 900 (different from first read)
+COMMIT;
+```
+
+**Phantom Read:**
+```sql
+-- Transaction 1 (using Repeatable Read)
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+BEGIN TRANSACTION;
+SELECT * FROM accounts WHERE balance > 500;
+-- Returns 3 rows
+
+-- Transaction 2
+BEGIN TRANSACTION;
+INSERT INTO accounts (id, balance) VALUES (5, 600);
+COMMIT;
+
+-- Transaction 1 continues
+SELECT * FROM accounts WHERE balance > 500;
+-- Now returns 4 rows (phantom row appeared)
+COMMIT;
+```
+
+## Advanced Concurrency Control Techniques
+
+### Multiversion Concurrency Control (MVCC)
+```mermaid
+graph TD
+    subgraph "MVCC"
+        A[Transaction 1: Read Version 1]
+        B[Transaction 2: Create Version 2]
+        C[Transaction 3: Read Version 1]
+        D[Transaction 1: Read Version 1]
+        E[Transaction 3: Read Version 2]
+        
+        A --> D
+        B --> E
+    end
+    
+    style A fill:#bbf,stroke:#333,stroke-width:2px
+    style B fill:#fdd,stroke:#333,stroke-width:2px
+    style C fill:#dfd,stroke:#333,stroke-width:2px
+    style D fill:#bbf,stroke:#333,stroke-width:2px
+    style E fill:#dfd,stroke:#333,stroke-width:2px
+```
+
+<details>
+<summary><strong>MVCC Implementation Details</strong></summary>
+
+1. **Version Creation**
+   - Each write creates a new version
+   - Old versions maintained
+   - Example:
+     ```
+     Row X, Version 1: {value: 100, txn_id: 10, start_ts: 100, end_ts: 200}
+     Row X, Version 2: {value: 150, txn_id: 15, start_ts: 200, end_ts: null}
+     ```
+
+2. **Version Visibility**
+   - Transaction sees versions based on timestamp
+   - Snapshot isolation
+   - Example:
+     ```sql
+     -- Transaction with timestamp 150 sees Version 1
+     -- Transaction with timestamp 250 sees Version 2
+     ```
+
+3. **Garbage Collection**
+   - Old versions eventually removed
+   - No transaction can see them
+   - Example:
+     ```sql
+     -- System determines Version 1 is no longer visible
+     -- Version 1 is removed during cleanup
+     ```
+
+4. **Benefits**
+   - Readers don't block writers
+   - Writers don't block readers
+   - Higher concurrency
+   - Less deadlock situations
+</details>
+
+### Optimistic vs. Pessimistic Concurrency Control
+
+| Feature | Optimistic | Pessimistic |
+|---------|------------|-------------|
+| **Lock Usage** | No locks during execution | Locks resources before access |
+| **Conflict Detection** | At commit time | Before data access |
+| **Best For** | Low contention scenarios | High contention scenarios |
+| **Performance** | Better when conflicts rare | Better when conflicts common |
+| **Implementation** | Validation phase at commit | Lock acquisition before operations |
+| **Example Systems** | PostgreSQL MVCC | Traditional locking in MySQL |
+
+#### Optimistic Concurrency Control Algorithm
+```
+1. Read Phase:
+   - Read data without locking
+   - Keep track of read set
+
+2. Local Computation:
+   - Perform all operations locally
+   - Track intended writes
+
+3. Validation Phase:
+   - Check if read data has been modified
+   - If conflict, abort and retry
+   - If no conflict, proceed
+
+4. Write Phase:
+   - Apply all changes to database
+   - Make changes visible to others
+```
+
+#### Optimistic Concurrency Control Example
+```sql
+-- Version tracking with timestamps
+BEGIN TRANSACTION;
+  SELECT balance, version FROM accounts WHERE id = 1;
+  -- Returns balance: 1000, version: 5
+  
+  -- Compute new balance locally
+  -- balance = 1000 - 100 = 900
+  
+  -- Update with version check
+  UPDATE accounts 
+  SET balance = 900, version = 6 
+  WHERE id = 1 AND version = 5;
+  
+  -- If affected rows = 0, conflict occurred
+  -- If affected rows = 1, update succeeded
+COMMIT;
+```
+
 ## Recovery Management
 
 <div title="Recovery management ensures that the database can be restored to a consistent state after failures">
@@ -392,6 +668,173 @@ sequenceDiagram
      ALTER DATABASE ARCHIVELOG;
      ```
 </details>
+
+### Recovery Strategies Comparison
+
+| Strategy | Mechanism | Recovery Time | Data Loss | Use Case |
+|----------|-----------|---------------|-----------|----------|
+| **Transaction Logs** | Write-Ahead Logging | Medium | None (if logs intact) | Most DBMS systems |
+| **Checkpointing** | Periodic consistent state | Reduces recovery time | None | Supplements logs |
+| **Shadow Paging** | Copy-on-write for pages | Fast | None | Some NoSQL systems |
+| **Replication** | Data copied to multiple servers | Very fast | Minimal | High availability systems |
+| **RAID Storage** | Hardware redundancy | Immediate | None | Infrastructure protection |
+
+## Advanced Transaction Models
+
+### Long-Running Transactions
+Long-running transactions can impact system performance through extended lock holding and increased conflict potential.
+
+#### Strategies for Managing Long Transactions
+1. **Save Points**
+   ```sql
+   BEGIN TRANSACTION;
+     -- Process first 1000 records
+     SAVEPOINT batch_1;
+     
+     -- Process next 1000 records
+     SAVEPOINT batch_2;
+     
+     -- If error occurs
+     ROLLBACK TO SAVEPOINT batch_1;
+     
+   COMMIT;
+   ```
+
+2. **Batch Processing**
+   ```sql
+   -- Process in batches of 1000
+   WHILE (records_remaining > 0) DO
+     BEGIN TRANSACTION;
+       -- Process up to 1000 records
+     COMMIT;
+   END WHILE;
+   ```
+
+3. **Compensating Transactions**
+   When a transaction can't be rolled back, create a new transaction that logically undoes the effects:
+   ```sql
+   -- Original Transaction
+   BEGIN TRANSACTION;
+     UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+     UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+   COMMIT;
+   
+   -- Compensating Transaction (if needed)
+   BEGIN TRANSACTION;
+     UPDATE accounts SET balance = balance + 100 WHERE id = 1;
+     UPDATE accounts SET balance = balance - 100 WHERE id = 2;
+   COMMIT;
+   ```
+
+### Distributed Transactions
+
+<div title="Distributed transactions span multiple database systems or services, requiring coordination for atomic execution">
+Distributed transactions involve multiple, separate database systems that must work together to ensure transaction properties.
+</div>
+
+#### Two-Phase Commit Protocol (2PC)
+```mermaid
+sequenceDiagram
+    participant C as Coordinator
+    participant P1 as Participant 1
+    participant P2 as Participant 2
+    
+    C->>P1: Prepare
+    C->>P2: Prepare
+    P1->>C: Ready
+    P2->>C: Ready
+    C->>P1: Commit
+    C->>P2: Commit
+    P1->>C: Acknowledge
+    P2->>C: Acknowledge
+```
+
+<details>
+<summary><strong>Two-Phase Commit Details</strong></summary>
+
+1. **Phase 1: Prepare**
+   - Coordinator asks participants if they can commit
+   - Participants must guarantee they can commit
+   - Example:
+     ```
+     Coordinator → Participant 1: "Can you commit Transaction T?"
+     Participant 1 → Coordinator: "Yes"
+     ```
+
+2. **Phase 2: Commit/Abort**
+   - If all participants ready, coordinator sends commit
+   - If any participant failed, coordinator sends abort
+   - Example:
+     ```
+     Coordinator → All Participants: "Commit Transaction T"
+     Participants → Coordinator: "Transaction T committed"
+     ```
+
+3. **Failure Handling**
+   - Timeout mechanisms
+   - Recovery procedures
+   - Example:
+     ```
+     Coordinator fails to get response from Participant 2
+     Coordinator → All Participants: "Abort Transaction T"
+     ```
+
+4. **Limitations**
+   - Blocking protocol
+   - Performance overhead
+   - Single point of failure (coordinator)
+</details>
+
+#### Three-Phase Commit Protocol (3PC)
+Adds a pre-commit phase to reduce blocking issues:
+
+1. **Phase 1: Prepare**
+   - Same as 2PC prepare phase
+
+2. **Phase 2: Pre-commit**
+   - Coordinator decides global commit/abort
+   - Participants prepare to commit but don't commit yet
+
+3. **Phase 3: Commit/Abort**
+   - Final commit instruction
+   - Participants complete the transaction
+
+#### Saga Pattern
+For long-running distributed transactions:
+
+```mermaid
+graph LR
+    T1[Transaction 1] --> C1[Compensating Transaction 1]
+    T2[Transaction 2] --> C2[Compensating Transaction 2]
+    T3[Transaction 3] --> C3[Compensating Transaction 3]
+    
+    T1 --> T2 --> T3
+    
+    style T1 fill:#dfd,stroke:#333,stroke-width:2px
+    style T2 fill:#dfd,stroke:#333,stroke-width:2px
+    style T3 fill:#fdd,stroke:#333,stroke-width:2px
+    style C1 fill:#bbf,stroke:#333,stroke-width:2px
+    style C2 fill:#bbf,stroke:#333,stroke-width:2px
+    style C3 fill:#bbf,stroke:#333,stroke-width:2px
+```
+
+1. **Sequential Transactions**
+   - Break large transaction into sequence of smaller ones
+   - Each transaction updates the database and publishes an event
+
+2. **Compensating Transactions**
+   - For each transaction, define a compensating transaction
+   - If any transaction fails, execute compensating transactions in reverse order
+
+3. **Example**
+   ```
+   T1: Reserve Hotel → Success
+   T2: Book Flight → Success
+   T3: Rent Car → Fails
+   
+   C2: Cancel Flight
+   C1: Cancel Hotel
+   ```
 
 ## Database Security
 

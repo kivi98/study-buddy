@@ -4,6 +4,52 @@
 
 > Reference: This content is based on Lecture 2 (L2 CSC 542 2.0 DBA)
 
+---
+
+## What is Database Design?
+
+<div title="Database design is the process of creating a structured blueprint for a database, determining how data will be stored, organized, and manipulated">
+Database design is the process of producing a detailed model of a database to meet specified requirements. It involves defining data structures, relationships between data elements, and the rules that govern operations on the data.
+</div>
+
+### Importance of Good Database Design
+
+| Benefit | Description | Real-World Impact |
+|---------|-------------|-------------------|
+| **Data Integrity** | Prevents invalid or inconsistent data | Accurate financial records in banking systems |
+| **Efficiency** | Optimizes storage and retrieval | Fast response times in e-commerce applications |
+| **Scalability** | Accommodates growth | Social media platforms handling millions of new users |
+| **Maintainability** | Easier to modify and extend | Healthcare systems adapting to new regulations |
+| **Security** | Better control over sensitive data | Protection of personal information in identity systems |
+| **Consistency** | Unified view of data | Consistent customer experience across channels |
+
+<details>
+<summary><strong>Consequences of Poor Database Design</strong></summary>
+
+1. **Data Redundancy**
+   - Duplicated data wastes storage
+   - Updates must be made in multiple places
+   - Example: Customer addresses stored in multiple tables, leading to inconsistencies when updated
+
+2. **Data Anomalies**
+   - Insert anomalies: Cannot add data without other unrelated data
+   - Update anomalies: Changes must be made in multiple places
+   - Delete anomalies: Deleting data unintentionally removes other needed data
+   - Example: Deleting an order deletes the only record of a customer's address
+
+3. **Poor Performance**
+   - Inefficient queries
+   - Excessive joins
+   - Example: A simple customer lookup requires joining 7 tables due to poor design
+
+4. **Difficult Maintenance**
+   - Hard to modify structure
+   - Complex dependencies
+   - Example: Adding a new product category requires changes to dozens of procedures
+</details>
+
+---
+
 ## Entity-Relationship Model
 
 <div title="The ER model is a conceptual data model that describes the structure of a database using entities, relationships, and attributes">
@@ -71,7 +117,62 @@ erDiagram
    - Composite Key: Multiple attributes
 </details>
 
-### Basic Concepts
+### Cardinality Notation Comparison
+
+| Relationship | Chen Notation | Crow's Foot | UML | Example |
+|--------------|--------------|-------------|-----|---------|
+| **One-to-One** | 1 — 1 | ──┼──────┼── | 1 — 1 | Person - Passport |
+| **One-to-Many** | 1 — M | ──┼──────〈 | 1 — * | Department - Employee |
+| **Many-to-One** | M — 1 | ──〉────┼── | * — 1 | Student - Class |
+| **Many-to-Many** | M — N | ──〉────〈 | * — * | Student - Course |
+| **Zero or One** | (0,1) | ──○────── | 0..1 | Person - Vehicle |
+| **Zero or More** | (0,N) | ──○────〈 | 0..* | Person - Skill |
+
+### Real-World ER Model Application
+
+**University Database System**
+```mermaid
+erDiagram
+    STUDENT ||--o{ ENROLLMENT : has
+    STUDENT {
+        string student_id PK
+        string name
+        date birth_date
+        string email
+        string major
+    }
+    COURSE ||--o{ ENROLLMENT : includes
+    COURSE {
+        string course_id PK
+        string title
+        int credits
+        string department
+    }
+    ENROLLMENT {
+        string student_id PK,FK
+        string course_id PK,FK
+        string semester
+        string grade
+    }
+    PROFESSOR ||--o{ COURSE : teaches
+    PROFESSOR {
+        string professor_id PK
+        string name
+        string department
+        string office
+        string email
+    }
+    DEPARTMENT ||--o{ PROFESSOR : employs
+    DEPARTMENT ||--o{ COURSE : offers
+    DEPARTMENT {
+        string dept_id PK
+        string name
+        string building
+        string budget
+    }
+```
+
+### Entity Types and Relationships
 
 <details>
 <summary><strong>Entity Types and Relationships</strong></summary>
@@ -102,25 +203,6 @@ erDiagram
      - Entity relates to itself
      - Example: Employee supervises Employee
 </details>
-
-### ER Diagram Components
-
-1. **Entity Sets**
-   - Rectangle represents entity set
-   - Name appears inside rectangle
-   - Attributes listed below or connected
-
-2. **Attributes**
-   - Oval represents attribute
-   - Name appears inside oval
-   - Connected to entity set by line
-   - Key attributes underlined
-
-3. **Relationships**
-   - Diamond represents relationship
-   - Name appears inside diamond
-   - Connected to participating entities
-   - Cardinality ratios shown on lines
 
 ### Enhanced ER Features
 
@@ -195,6 +277,8 @@ classDiagram
      ```
 </details>
 
+---
+
 ## Relational Data Model
 
 <div title="The relational model organizes data into tables (relations) with rows and columns, using keys to establish relationships">
@@ -253,6 +337,32 @@ graph LR
    - Foreign Key: References other tables
    - Composite Key: Multiple columns
 </details>
+
+### Relational Algebra Operations
+
+| Operation | Symbol | Description | Example SQL |
+|-----------|--------|-------------|------------|
+| **Selection** | σ (sigma) | Filters rows based on condition | `SELECT * FROM Employee WHERE dept_id = 101` |
+| **Projection** | π (pi) | Selects specific columns | `SELECT name, email FROM Employee` |
+| **Union** | ∪ | Combines two relations | `SELECT * FROM Employee1 UNION SELECT * FROM Employee2` |
+| **Intersection** | ∩ | Common rows in two relations | `SELECT * FROM Employee1 INTERSECT SELECT * FROM Employee2` |
+| **Difference** | - | Rows in first but not second relation | `SELECT * FROM Employee1 EXCEPT SELECT * FROM Employee2` |
+| **Product** | × | Cartesian product of two relations | `SELECT * FROM Employee, Department` |
+| **Join** | ⋈ | Combines related tuples | `SELECT * FROM Employee JOIN Department ON Employee.dept_id = Department.dept_id` |
+| **Division** | ÷ | Complex operation for "for all" queries | Custom SQL with NOT EXISTS |
+
+### Mapping ER to Relational Model
+
+| ER Concept | Relational Mapping | Example |
+|------------|-------------------|---------|
+| **Entity** | Table | `CREATE TABLE Customer (...)` |
+| **Attribute** | Column | `customer_id, name, email` |
+| **Primary Key** | Primary Key constraint | `customer_id PRIMARY KEY` |
+| **1:1 Relationship** | Foreign key in either table | `FOREIGN KEY (passport_id) REFERENCES Passport(id)` |
+| **1:N Relationship** | Foreign key in "many" table | `FOREIGN KEY (dept_id) REFERENCES Department(id)` |
+| **M:N Relationship** | Junction table with two foreign keys | `OrderItems with order_id and product_id` |
+| **Weak Entity** | Table with composite primary key | `Dependent(emp_id, dependent_name)` |
+| **Specialization** | Single table or multiple tables | `Employee with type OR Manager, Staff tables` |
 
 ### Keys and Dependencies
 ```mermaid
@@ -320,68 +430,29 @@ graph TD
      ```
 </details>
 
-### Basic Concepts
-
-1. **Relation**
-   - Table with rows and columns
-   - Properties:
-     - Ordering of rows immaterial
-     - Duplicate rows not allowed
-     - Ordering of columns immaterial
-     - Values atomic
-
-2. **Attributes**
-   - Columns of the relation
-   - Each attribute has a domain
-   - Must have unique names within relation
-
-3. **Tuple**
-   - Row of the relation
-   - Contains one value for each attribute
-   - Must be unique within relation
-
-### Keys
-
-1. **Superkey**
-   - Set of attributes that uniquely identifies tuples
-   - May contain unnecessary attributes
-
-2. **Candidate Key**
-   - Minimal superkey
-   - No proper subset is a superkey
-   - May have multiple candidate keys
-
-3. **Primary Key**
-   - Chosen candidate key
-   - Used to identify tuples
-   - Should be:
-     - Unique
-     - Minimal
-     - Never changing
-     - Never null
-
-4. **Foreign Key**
-   - Attributes referencing primary key
-   - Creates relationships between tables
-   - Maintains referential integrity
-
 ### Integrity Constraints
 
 1. **Entity Integrity**
    - Primary key cannot be null
    - Ensures unique identification
+   - Example: `student_id` cannot be null in `Students` table
 
 2. **Referential Integrity**
    - Foreign key must match existing primary key
    - Or be null if allowed
+   - Example: `dept_id` in `Employee` must exist in `Department` table
 
 3. **Domain Integrity**
    - Values must be within defined domain
    - Includes data types and ranges
+   - Example: Salary must be positive, Age must be between 0 and 120
 
 4. **User-Defined Integrity**
    - Business rules
    - Application-specific constraints
+   - Example: Order total must match sum of line items
+
+---
 
 ## Database Schema Design
 
@@ -406,40 +477,127 @@ flowchart TD
    - Each attribute should be atomic
    - No multi-valued attributes
    - No composite attributes
+   - Example: Split "Full Name" into "First Name" and "Last Name"
 
 2. **Minimal Redundancy**
    - Avoid storing same data multiple times
    - Use relationships instead of duplication
+   - Example: Store product details once, reference by ID in orders
 
 3. **Data Integrity**
    - Design should enforce integrity constraints
    - Use appropriate key constraints
+   - Example: Define foreign keys to ensure valid relationships
 
 4. **Flexibility**
    - Schema should be adaptable
    - Allow for future changes
+   - Example: Use categories instead of hard-coded types
 
-### Design Steps
+### Schema Design Case Study: Banking System
 
-1. **Requirement Analysis**
-   - Understand business rules
-   - Identify data requirements
-   - Document constraints
+**Requirements:**
+- Track customer accounts and transactions
+- Support multiple account types
+- Maintain transaction history
+- Handle joint accounts
 
-2. **Conceptual Design**
-   - Create ER diagram
-   - Define entities and relationships
-   - Identify attributes
+**Conceptual Design:**
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ACCOUNT : owns
+    CUSTOMER {
+        int customer_id
+        string name
+        string address
+        string contact_info
+    }
+    ACCOUNT ||--o{ TRANSACTION : contains
+    ACCOUNT {
+        int account_id
+        string account_type
+        decimal balance
+        date opened_date
+    }
+    TRANSACTION {
+        int transaction_id
+        int account_id
+        datetime timestamp
+        decimal amount
+        string type
+        string description
+    }
+    ACCOUNT_TYPE ||--o{ ACCOUNT : defines
+    ACCOUNT_TYPE {
+        string type_code
+        string description
+        decimal interest_rate
+        decimal minimum_balance
+    }
+    CUSTOMER_ACCOUNT }|--|| CUSTOMER : links
+    CUSTOMER_ACCOUNT }|--|| ACCOUNT : links
+    CUSTOMER_ACCOUNT {
+        int customer_id
+        int account_id
+        string access_level
+    }
+```
 
-3. **Logical Design**
-   - Convert ER to relations
-   - Apply normalization
-   - Define integrity constraints
+**Logical Design:**
+```sql
+-- Customer Table
+CREATE TABLE Customer (
+    customer_id INT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    address VARCHAR(200),
+    city VARCHAR(50),
+    state VARCHAR(2),
+    zip VARCHAR(10),
+    phone VARCHAR(15),
+    email VARCHAR(100)
+);
 
-4. **Physical Design**
-   - Choose storage structures
-   - Define access paths
-   - Implement security
+-- Account Type Table
+CREATE TABLE Account_Type (
+    type_code VARCHAR(10) PRIMARY KEY,
+    description VARCHAR(100),
+    interest_rate DECIMAL(5,2),
+    minimum_balance DECIMAL(10,2),
+    monthly_fee DECIMAL(7,2)
+);
+
+-- Account Table
+CREATE TABLE Account (
+    account_id INT PRIMARY KEY,
+    type_code VARCHAR(10) NOT NULL,
+    balance DECIMAL(10,2) NOT NULL,
+    opened_date DATE NOT NULL,
+    status VARCHAR(10) NOT NULL,
+    FOREIGN KEY (type_code) REFERENCES Account_Type(type_code)
+);
+
+-- Customer_Account Junction Table (for joint accounts)
+CREATE TABLE Customer_Account (
+    customer_id INT,
+    account_id INT,
+    access_level VARCHAR(20) NOT NULL,
+    PRIMARY KEY (customer_id, account_id),
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+);
+
+-- Transaction Table
+CREATE TABLE Transaction (
+    transaction_id INT PRIMARY KEY,
+    account_id INT NOT NULL,
+    transaction_date DATETIME NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    description VARCHAR(100),
+    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+);
+```
 
 ### Common Design Patterns
 
@@ -447,21 +605,25 @@ flowchart TD
    - One master table
    - Multiple detail tables
    - One-to-many relationships
+   - Example: Order (master) and OrderItems (detail)
 
 2. **Hierarchical Data**
    - Parent-child relationships
    - Self-referencing tables
    - Closure tables
+   - Example: Organizational structure with managers and employees
 
 3. **Many-to-Many**
    - Junction tables
    - Association tables
    - Link tables
+   - Example: Students and Courses linked by Enrollment table
 
 4. **Temporal Data**
    - Historical tracking
    - Effective dating
    - Audit trails
+   - Example: Employee salary history with effective dates
 
 #### Master-Detail Pattern
 ```mermaid
@@ -495,27 +657,181 @@ graph TD
     style F fill:#dfd,stroke:#333,stroke-width:2px
 ```
 
+### Implementing Hierarchical Data: Comparison of Approaches
+
+| Approach | Description | Pros | Cons | Example SQL |
+|----------|-------------|------|------|------------|
+| **Adjacency List** | Each record points to parent | Simple, intuitive | Inefficient for deep queries | `Parent_ID references ID` |
+| **Nested Sets** | Left/Right values define tree | Fast read operations | Expensive updates | `LEFT_ID < child LEFT_ID AND RIGHT_ID > child RIGHT_ID` |
+| **Materialized Path** | Store path as string | Good for path queries | Complex implementation | `path LIKE '/1/2/3/%'` |
+| **Closure Table** | Store all relationships | Flexible and efficient | Extra storage needed | Junction table with ancestor/descendant |
+
+```sql
+-- Adjacency List Example
+CREATE TABLE Employee (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    manager_id INT,
+    FOREIGN KEY (manager_id) REFERENCES Employee(id)
+);
+
+-- Closure Table Example
+CREATE TABLE Employee_Hierarchy (
+    ancestor_id INT,
+    descendant_id INT,
+    depth INT,
+    PRIMARY KEY (ancestor_id, descendant_id),
+    FOREIGN KEY (ancestor_id) REFERENCES Employee(id),
+    FOREIGN KEY (descendant_id) REFERENCES Employee(id)
+);
+```
+
 ### Design Optimization
 
 1. **Denormalization**
    - Controlled redundancy
    - Performance improvement
    - Trade-offs involved
+   - Example: Storing product_name in OrderItems for faster queries
 
 2. **Indexing Strategy**
    - Choose appropriate indexes
    - Balance retrieval vs. update
    - Consider query patterns
+   - Example: Index on frequently filtered columns
 
 3. **Partitioning**
-   - Horizontal partitioning
+   - Horizontal partitioning (sharding)
    - Vertical partitioning
    - Improve performance
+   - Example: Partition customer data by region
 
 4. **Views**
    - Virtual tables
    - Data abstraction
    - Security implementation
+   - Example: Create limited view for customer service staff
+
+### Comparison: Normalization vs. Denormalization
+
+| Factor | Normalization | Denormalization |
+|--------|--------------|-----------------|
+| **Data Redundancy** | Minimized | Controlled redundancy |
+| **Data Integrity** | Better | Requires vigilance |
+| **Query Complexity** | Complex joins | Simpler queries |
+| **Read Performance** | Slower for complex queries | Faster reads |
+| **Write Performance** | Better for updates | Overhead for updates |
+| **Storage Requirements** | Generally less | More space needed |
+| **Best For** | OLTP systems | OLAP/reporting systems |
+| **Example Use Case** | Banking transactions | Sales reports |
+
+---
+
+## Real-World Design Examples
+
+### E-Commerce Database
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    CUSTOMER {
+        int customer_id
+        string name
+        string email
+        string address
+    }
+    ORDER ||--|{ ORDER_ITEM : contains
+    ORDER {
+        int order_id
+        int customer_id
+        date order_date
+        string status
+        decimal total
+    }
+    PRODUCT ||--o{ ORDER_ITEM : "included in"
+    PRODUCT {
+        int product_id
+        string name
+        string description
+        decimal price
+        int stock
+        int category_id
+    }
+    ORDER_ITEM {
+        int order_id
+        int product_id
+        int quantity
+        decimal price
+    }
+    CATEGORY ||--o{ PRODUCT : contains
+    CATEGORY {
+        int category_id
+        string name
+        string description
+    }
+    PAYMENT ||--|| ORDER : "paid for"
+    PAYMENT {
+        int payment_id
+        int order_id
+        date payment_date
+        decimal amount
+        string method
+    }
+```
+
+### Healthcare System Database
+
+```mermaid
+erDiagram
+    PATIENT ||--o{ APPOINTMENT : schedules
+    PATIENT {
+        int patient_id
+        string name
+        date birth_date
+        string contact_info
+        string insurance
+    }
+    DOCTOR ||--o{ APPOINTMENT : conducts
+    DOCTOR {
+        int doctor_id
+        string name
+        string specialty
+        string contact_info
+    }
+    APPOINTMENT ||--o{ PRESCRIPTION : generates
+    APPOINTMENT {
+        int appointment_id
+        int patient_id
+        int doctor_id
+        datetime time
+        string reason
+        string notes
+    }
+    PRESCRIPTION {
+        int prescription_id
+        int appointment_id
+        int medication_id
+        string dosage
+        string instructions
+        date issue_date
+    }
+    MEDICATION ||--o{ PRESCRIPTION : "prescribed as"
+    MEDICATION {
+        int medication_id
+        string name
+        string manufacturer
+        string description
+    }
+    PATIENT ||--o{ MEDICAL_RECORD : has
+    MEDICAL_RECORD {
+        int record_id
+        int patient_id
+        date record_date
+        string diagnosis
+        string treatment
+        string notes
+    }
+```
 
 ## Related Topics
 - [Database Implementation](database-implementation.md) - Physical design and implementation
