@@ -307,6 +307,29 @@
             }
         }
         
+        /* Hide sidebar in landscape mode on mobile devices */
+        @media (max-width: 992px) and (orientation: landscape) {
+            .sidebar {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 250px;
+                z-index: 1050;
+            }
+            
+            .mobile-navbar {
+                display: block;
+            }
+            
+            .content {
+                width: 100%;
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+        
         /* Navbar for mobile */
         .mobile-navbar {
             display: none;
@@ -513,6 +536,7 @@
             const sidebarClose = document.getElementById('sidebar-close');
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('sidebar-backdrop');
+            const content = document.querySelector('.content');
             
             if (sidebarToggle && sidebar && backdrop && sidebarClose) {
                 sidebarToggle.addEventListener('click', function() {
@@ -529,6 +553,37 @@
                 
                 sidebarClose.addEventListener('click', closeSidebar);
                 backdrop.addEventListener('click', closeSidebar);
+            }
+            
+            // Handle orientation change
+            window.addEventListener('orientationchange', function() {
+                // Close sidebar if it's open
+                if (sidebar && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                    if (backdrop) backdrop.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+                
+                // Adjust content width in landscape mode
+                if (window.matchMedia("(orientation: landscape) and (max-width: 992px)").matches) {
+                    if (content) {
+                        content.classList.add('col-12');
+                        content.classList.remove('col-md-9', 'col-lg-10');
+                    }
+                } else {
+                    if (content) {
+                        content.classList.remove('col-12');
+                        content.classList.add('col-md-9', 'col-lg-10');
+                    }
+                }
+            });
+            
+            // Run orientation check on load
+            if (window.matchMedia("(orientation: landscape) and (max-width: 992px)").matches) {
+                if (content) {
+                    content.classList.add('col-12');
+                    content.classList.remove('col-md-9', 'col-lg-10');
+                }
             }
             
             // KaTeX rendering

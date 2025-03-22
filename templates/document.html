@@ -1,28 +1,421 @@
 {% extends "base.html" %}
 
+{% block head %}
+{{ super() }}
+<style>
+    .font-size-controls {
+        position: fixed;
+        right: 15px;
+        bottom: 15px;
+        z-index: 1000;
+        background-color: var(--bs-body-bg);
+        border-radius: 50px;
+        padding: 5px 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+    }
+    
+    .font-size-controls:hover {
+        opacity: 1;
+    }
+    
+    .font-size-controls button {
+        background: none;
+        border: none;
+        color: var(--bs-body-color);
+        font-size: 1.2rem;
+        padding: 0 5px;
+        cursor: pointer;
+    }
+    
+    .font-size-controls .font-size-value {
+        margin: 0 5px;
+        min-width: 24px;
+        text-align: center;
+    }
+    
+    /* Enhanced table styles */
+    .markdown-body table {
+        width: 100%;
+        margin-bottom: 1.5rem;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.09) !important;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    .markdown-body table thead {
+        background: linear-gradient(to bottom, var(--bs-primary), rgba(var(--bs-primary-rgb), 0.85));
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .markdown-body table th {
+        padding: 14px 16px;
+        text-align: left;
+        font-weight: 600;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        position: relative;
+        letter-spacing: 0.02em;
+        transition: background-color 0.2s ease;
+    }
+    
+    .markdown-body table td {
+        padding: 12px 16px;
+        border: 1px solid rgba(0,0,0,0.07) !important;
+        vertical-align: top;
+        transition: all 0.15s ease;
+    }
+    
+    .markdown-body table tr:nth-child(even) {
+        background-color: rgba(0,0,0,0.015);
+    }
+    
+    .markdown-body table tr {
+        transition: background-color 0.15s ease, transform 0.15s ease;
+    }
+    
+    .markdown-body table tr:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.04);
+        transform: translateY(-1px);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        z-index: 1;
+        position: relative;
+    }
+    
+    .markdown-body table tr:hover td {
+        border-color: rgba(var(--bs-primary-rgb), 0.15) !important;
+    }
+    
+    /* For tables with borderless class */
+    .markdown-body table.borderless th {
+        border: none !important;
+        border-bottom: 2px solid rgba(255,255,255,0.3) !important;
+    }
+    
+    .markdown-body table.borderless td {
+        border: none !important;
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+    }
+    
+    [data-bs-theme="dark"] .markdown-body table.borderless th {
+        border: none !important;
+        border-bottom: 2px solid rgba(255,255,255,0.2) !important;
+    }
+    
+    [data-bs-theme="dark"] .markdown-body table.borderless td {
+        border: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    }
+    
+    /* Add fixed width to make tables more consistent */
+    .markdown-body table.fixed-layout {
+        table-layout: fixed;
+    }
+    
+    /* Sortable headers */
+    .markdown-body table th.sortable {
+        cursor: pointer;
+        position: relative;
+        user-select: none;
+        padding-right: 28px;
+    }
+    
+    .markdown-body table th.sortable:hover {
+        background-color: rgba(255,255,255,0.15);
+    }
+    
+    .markdown-body table th .sort-icon {
+        display: inline-block;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        font-size: 12px;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+    }
+    
+    .markdown-body table th[data-sort-direction="asc"] .sort-icon,
+    .markdown-body table th[data-sort-direction="desc"] .sort-icon {
+        opacity: 1;
+        color: rgba(255,255,255,0.9);
+    }
+    
+    /* Table control panel */
+    .table-controls {
+        background-color: var(--bs-body-bg);
+        border-radius: 10px 10px 0 0;
+        padding: 10px 16px;
+        border: 1px solid rgba(0,0,0,0.05);
+        border-bottom: none;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.02);
+    }
+    
+    /* Table control buttons */
+    .table-controls .btn-group .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 3px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        transition: all 0.2s ease;
+        padding: 6px 12px;
+    }
+    
+    .table-controls .btn-group .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+    
+    .table-controls .btn-group .btn:active {
+        transform: translateY(0);
+    }
+    
+    .table-controls .btn-group .btn i {
+        margin-right: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .table-controls .input-group {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    .table-controls .input-group-text {
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+        padding: 6px 12px;
+    }
+    
+    .table-controls .input-group .form-control {
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+        border-color: rgba(0,0,0,0.1);
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+    
+    .table-controls .input-group .form-control:focus {
+        box-shadow: none;
+        border-color: var(--bs-primary);
+    }
+    
+    /* Full width table support */
+    .table-fullwidth {
+        max-width: 100vw;
+        width: calc(100% + 40px);
+        margin-left: -20px;
+        margin-right: -20px;
+        padding: 0 20px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Custom table wrapper */
+    .custom-table-wrapper {
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    /* No results message */
+    .no-results-message {
+        font-size: 0.9rem;
+    }
+    
+    /* Dark mode table styles */
+    [data-bs-theme="dark"] .markdown-body table {
+        border: 1px solid rgba(255,255,255,0.07) !important;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+        background-color: rgba(255,255,255,0.02);
+    }
+    
+    [data-bs-theme="dark"] .markdown-body table thead {
+        background: linear-gradient(to bottom, var(--bs-primary), rgba(var(--bs-primary-rgb), 0.8));
+        box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+    }
+    
+    [data-bs-theme="dark"] .markdown-body table th {
+        color: white;
+        border: 1px solid rgba(255,255,255,0.15) !important;
+    }
+    
+    [data-bs-theme="dark"] .markdown-body table td {
+        border: 1px solid rgba(255,255,255,0.06) !important;
+    }
+    
+    [data-bs-theme="dark"] .markdown-body table tr:nth-child(even) {
+        background-color: rgba(255,255,255,0.015);
+    }
+    
+    [data-bs-theme="dark"] .markdown-body table tr:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+    }
+    
+    [data-bs-theme="dark"] .markdown-body table tr:hover td {
+        border-color: rgba(var(--bs-primary-rgb), 0.2) !important;
+    }
+    
+    /* Dark mode table controls */
+    [data-bs-theme="dark"] .table-controls {
+        background-color: var(--bs-body-bg);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-bottom: none;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+    }
+    
+    [data-bs-theme="dark"] .table-controls .input-group {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    [data-bs-theme="dark"] .table-controls .input-group .form-control {
+        border-color: rgba(255,255,255,0.1);
+        background-color: rgba(0,0,0,0.2);
+        color: rgba(255,255,255,0.9);
+    }
+    
+    [data-bs-theme="dark"] .table-controls .btn-group .btn {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    /* Responsive tables for mobile */
+    @media (max-width: 768px) {
+        .markdown-body table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        .markdown-body table thead {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        
+        .table-controls {
+            overflow-x: auto;
+        }
+    }
+    
+    @media (orientation: landscape) and (max-width: 992px) {
+        .font-size-controls {
+            top: 15px;
+            bottom: auto;
+        }
+        
+        .document-title-container {
+            margin-top: 50px;
+        }
+    }
+    
+    /* Mermaid diagram styles for dark mode */
+    [data-bs-theme="dark"] .mermaid .node rect, 
+    [data-bs-theme="dark"] .mermaid .node circle,
+    [data-bs-theme="dark"] .mermaid .node ellipse,
+    [data-bs-theme="dark"] .mermaid .node polygon,
+    [data-bs-theme="dark"] .mermaid .node path {
+        fill: #2d3748 !important;
+        stroke: var(--bs-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .mermaid .label {
+        color: #e2e8f0 !important;
+    }
+
+    [data-bs-theme="dark"] .mermaid .edgeLabel {
+        background-color: #2d3748 !important;
+        color: #e2e8f0 !important;
+    }
+
+    [data-bs-theme="dark"] .mermaid .edgePath .path,
+    [data-bs-theme="dark"] .mermaid line {
+        stroke: var(--bs-primary) !important;
+    }
+
+    /* Add hover effect to the whole table */
+    .custom-table-wrapper:hover .markdown-body table {
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Add alternating row colors for better readability */
+    .markdown-body table tbody tr:nth-child(even) {
+        background-color: rgba(0,0,0,0.015);
+    }
+
+    /* Add scroll indicator for wide tables */
+    .table-responsive.custom-table-wrapper {
+        position: relative;
+    }
+
+    .table-responsive.custom-table-wrapper::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 24px;
+        background: linear-gradient(to right, rgba(255,255,255,0), rgba(0,0,0,0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .table-responsive.custom-table-wrapper.has-overflow::after {
+        opacity: 1;
+    }
+
+    /* Dark mode enhancements */
+    [data-bs-theme="dark"] .markdown-body table tbody tr:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    [data-bs-theme="dark"] .table-responsive.custom-table-wrapper::after {
+        background: linear-gradient(to right, rgba(0,0,0,0), rgba(255,255,255,0.05));
+    }
+</style>
+{% endblock %}
+
 {% block title %}{{ title.replace('-', ' ').title() }} - Study Buddy{% endblock %}
 
 {% block content %}
-<div class="mb-4 d-flex justify-content-between align-items-center">
-    <h1 class="mb-0">{{ title.replace('-', ' ').title() }}</h1>
-    <div class="reading-controls">
-        <div class="btn-group" role="group">
-            <button id="zoom-out" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-search-minus"></i>
-            </button>
-            <button id="zoom-reset" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-sync-alt"></i> Reset
-            </button>
-            <button id="zoom-in" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-search-plus"></i>
-            </button>
-        </div>
+<div class="document-title-container mb-4">
+    <h1>{{ title.replace('-', ' ').title() }}</h1>
+    <div class="subject-path text-muted">
+        <a href="{{ url_for('index') }}">Home</a>
+        {% if subject %}
+         / <a href="{{ url_for('subject', subject=subject) }}">{{ subject.replace('-', ' ').title() }}</a> / 
+        {{ title.replace('-', ' ').title() }}
+        {% else %}
+         / {{ title.replace('-', ' ').title() }}
+        {% endif %}
     </div>
 </div>
 
-<article class="markdown-content" id="markdown-content">
-    {{ content | safe }}
-</article>
+<div id="markdown-content" class="markdown-body">
+    {{ content|safe }}
+</div>
+
+<div class="font-size-controls">
+    <button id="decrease-font" aria-label="Decrease font size"><i class="fas fa-minus"></i></button>
+    <span id="font-size-value" class="font-size-value">100%</span>
+    <button id="increase-font" aria-label="Increase font size"><i class="fas fa-plus"></i></button>
+</div>
 
 <div id="mermaid-fallback-container" style="display: none;">
     <div class="alert alert-warning alert-dismissible fade show mt-4" role="alert">
@@ -35,93 +428,500 @@
 </div>
 
 <script>
-    // Re-initialize Mermaid for this specific document
-    document.addEventListener("DOMContentLoaded", function() {
-        // Find all mermaid divs
-        const mermaidDivs = document.querySelectorAll('.mermaid');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize mermaid with neutral theme
+        mermaid.initialize({ theme: 'neutral' });
         
-        // Debug output
-        console.log("Found " + mermaidDivs.length + " mermaid diagrams");
-        
-        if (mermaidDivs.length > 0) {
-            // Log the content of diagrams for debugging
-            mermaidDivs.forEach((div, index) => {
-                console.log(`Diagram ${index} content:`, div.textContent.trim().substring(0, 100) + "...");
+        // Force grid lines on tables
+        function enforceTableGridLines() {
+            console.log("Enforcing grid lines on tables");
+            const style = document.createElement('style');
+            style.textContent = `
+                .markdown-body table {
+                    border-collapse: separate !important;
+                    border-spacing: 0 !important;
+                    border-radius: 10px !important;
+                    overflow: hidden !important;
+                }
+                .markdown-body table,
+                .markdown-body table th,
+                .markdown-body table td {
+                    border-style: solid !important;
+                    border-width: 1px !important;
+                }
+                .markdown-body table th {
+                    border-color: rgba(255,255,255,0.2) !important;
+                }
+                .markdown-body table td {
+                    border-color: rgba(0,0,0,0.07) !important;
+                }
+                [data-bs-theme="dark"] .markdown-body table {
+                    border-color: rgba(255,255,255,0.07) !important;
+                }
+                [data-bs-theme="dark"] .markdown-body table th {
+                    border-color: rgba(255,255,255,0.15) !important;
+                }
+                [data-bs-theme="dark"] .markdown-body table td {
+                    border-color: rgba(255,255,255,0.06) !important;
+                }
+                .markdown-body table tr:last-child td {
+                    border-bottom-width: 1px !important;
+                }
+                .markdown-body table td:first-child {
+                    border-left-width: 1px !important;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Check if dark mode is active
+            const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            
+            // Also directly apply styles to all tables
+            document.querySelectorAll('.markdown-body table').forEach(table => {
+                table.style.borderCollapse = 'separate';
+                table.style.borderSpacing = '0';
+                table.style.borderRadius = '10px';
+                table.style.overflow = 'hidden';
+                
+                if (isDarkMode) {
+                    table.style.border = '1px solid rgba(255,255,255,0.07)';
+                    
+                    table.querySelectorAll('th').forEach(th => {
+                        th.style.border = '1px solid rgba(255,255,255,0.15)';
+                    });
+                    
+                    table.querySelectorAll('td').forEach(td => {
+                        td.style.border = '1px solid rgba(255,255,255,0.06)';
+                    });
+                } else {
+                    table.style.border = '1px solid rgba(0,0,0,0.09)';
+                    
+                    table.querySelectorAll('th').forEach(th => {
+                        th.style.border = '1px solid rgba(255,255,255,0.2)';
+                    });
+                    
+                    table.querySelectorAll('td').forEach(td => {
+                        td.style.border = '1px solid rgba(0,0,0,0.07)';
+                    });
+                }
             });
             
-            // Make sure mermaid is loaded before initializing
-            if (typeof mermaid !== 'undefined') {
+            // Listen for theme changes and update styles accordingly
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'data-bs-theme') {
+                        const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+                        document.querySelectorAll('.markdown-body table').forEach(table => {
+                            if (isDarkMode) {
+                                table.style.border = '1px solid rgba(255,255,255,0.07)';
+                                
+                                table.querySelectorAll('th').forEach(th => {
+                                    th.style.border = '1px solid rgba(255,255,255,0.15)';
+                                });
+                                
+                                table.querySelectorAll('td').forEach(td => {
+                                    td.style.border = '1px solid rgba(255,255,255,0.06)';
+                                });
+                            } else {
+                                table.style.border = '1px solid rgba(0,0,0,0.09)';
+                                
+                                table.querySelectorAll('th').forEach(th => {
+                                    th.style.border = '1px solid rgba(255,255,255,0.2)';
+                                });
+                                
+                                table.querySelectorAll('td').forEach(td => {
+                                    td.style.border = '1px solid rgba(0,0,0,0.07)';
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+            observer.observe(document.documentElement, { attributes: true });
+        }
+        
+        // Call the enforce function after a slight delay to ensure DOM is fully processed
+        setTimeout(enforceTableGridLines, 100);
+        
+        // Find all Mermaid diagrams and render them
+        const diagrams = document.querySelectorAll('.mermaid');
+        if (diagrams.length > 0) {
+            diagrams.forEach((diagram, index) => {
                 try {
-                    // Reset mermaid to make sure we're using a fresh instance
-                    mermaid.initialize({ theme: 'neutral' }); // Ensure neutral theme
-                    mermaid.init(undefined, document.querySelectorAll(".mermaid"));
+                    // Add unique ID to each diagram for reference
+                    if (!diagram.id) {
+                        diagram.id = 'mermaid-diagram-' + index;
+                    }
+                } catch (error) {
+                    console.error('Error rendering diagram', error);
+                    // Create alert for rendering issues
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-warning mt-2';
+                    alertDiv.innerHTML = 'There was an issue rendering this diagram. <button class="btn btn-sm btn-outline-secondary try-alt-renderer">Try alternate renderer</button>';
+                    diagram.parentNode.insertBefore(alertDiv, diagram.nextSibling);
                     
-                    // Check for render errors after a slight delay
-                    setTimeout(function() {
-                        const errorDivs = document.querySelectorAll('.mermaid svg.error');
-                        if (errorDivs.length > 0 || document.querySelectorAll('.mermaid:empty').length > 0) {
-                            console.log("Mermaid rendering errors detected");
-                            document.getElementById('mermaid-fallback-container').style.display = 'block';
+                    // Add event listener to the button
+                    alertDiv.querySelector('.try-alt-renderer').addEventListener('click', function() {
+                        try {
+                            const content = diagram.textContent;
+                            diagram.innerHTML = '';
+                            mermaid.render('mermaid-alt-' + index, content, function(svgCode) {
+                                diagram.innerHTML = svgCode;
+                                alertDiv.remove();
+                            });
+                        } catch (e) {
+                            console.error('Alternative rendering failed', e);
+                            alertDiv.innerHTML = 'All rendering methods failed. Please check the diagram syntax.';
                         }
-                    }, 1000);
-                } catch (e) {
-                    console.error("Mermaid initialization error:", e);
-                    document.getElementById('mermaid-fallback-container').style.display = 'block';
+                    });
                 }
-            } else {
-                console.error("Mermaid library not loaded!");
-                document.getElementById('mermaid-fallback-container').style.display = 'block';
+            });
+        }
+        
+        // Table enhancements
+        const tables = document.querySelectorAll('.markdown-body table');
+        tables.forEach((table, tableIndex) => {
+            // Add responsive wrapper and custom class
+            const wrapper = document.createElement('div');
+            wrapper.className = 'table-responsive custom-table-wrapper mb-4';
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+            table.classList.add('enhanced-table');
+            table.id = 'table-' + tableIndex;
+            
+            // Determine if table should use fixed layout based on column count
+            const headerCells = table.querySelectorAll('thead th').length;
+            if (headerCells > 0 && headerCells <= 5) {
+                table.classList.add('fixed-layout');
+            }
+            
+            // Add control panel for tables with headers
+            const tableHead = table.querySelector('thead');
+            if (tableHead && tableHead.querySelectorAll('th').length > 0) {
+                const controlPanel = document.createElement('div');
+                controlPanel.className = 'table-controls mb-2 d-flex align-items-center flex-wrap';
+                controlPanel.innerHTML = `
+                    <div class="input-group input-group-sm me-2 mb-2" style="max-width: 250px;">
+                        <span class="input-group-text bg-primary text-white">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control table-filter" placeholder="Filter table..." 
+                            aria-label="Filter table" data-target="table-${tableIndex}">
+                    </div>
+                    <div class="btn-group me-2 mb-2" role="group" aria-label="Table controls">
+                        <button class="btn btn-sm btn-outline-primary table-grid-btn" data-target="table-${tableIndex}" title="Hide grid lines">
+                            <i class="fas fa-border-all"></i> Grid On
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary table-layout-btn" data-target="table-${tableIndex}" title="Toggle fixed layout">
+                            <i class="fas fa-columns"></i> Layout
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary table-expand-btn" data-target="table-${tableIndex}" title="Expand to full width">
+                            <i class="fas fa-expand-alt"></i> Width
+                        </button>
+                    </div>
+                `;
+                wrapper.insertBefore(controlPanel, table);
+                
+                // Make headers sortable
+                const headers = tableHead.querySelectorAll('th');
+                headers.forEach((header, index) => {
+                    if (header.textContent.trim() !== '') {
+                        header.classList.add('sortable');
+                        header.setAttribute('data-sort-index', index);
+                        header.setAttribute('data-sort-direction', 'none');
+                        header.setAttribute('title', 'Click to sort');
+                        header.innerHTML += ' <span class="sort-icon ms-1"></span>';
+                        
+                        header.addEventListener('click', function() {
+                            sortTable(table, index, this);
+                        });
+                    }
+                });
+                
+                // Add filter functionality
+                const filterInput = controlPanel.querySelector('.table-filter');
+                filterInput.addEventListener('input', function() {
+                    filterTable(table, this.value);
+                });
+                
+                // Add grid toggle functionality
+                const gridBtn = controlPanel.querySelector('.table-grid-btn');
+                gridBtn.classList.add('active');  // Mark as active by default
+                gridBtn.classList.remove('btn-outline-primary');
+                gridBtn.classList.add('btn-primary');  // Show as active by default
+                
+                gridBtn.addEventListener('click', function() {
+                    const targetTable = document.getElementById(this.getAttribute('data-target'));
+                    targetTable.classList.toggle('borderless');
+                    
+                    // Toggle button active state
+                    if (targetTable.classList.contains('borderless')) {
+                        this.classList.remove('btn-primary');
+                        this.classList.add('btn-outline-secondary');
+                        this.setAttribute('title', 'Show grid lines');
+                        this.innerHTML = '<i class="fas fa-border-all"></i> Grid Off';
+                        
+                        // Apply borderless styles
+                        const style = document.createElement('style');
+                        style.id = `borderless-style-${tableIndex}`;
+                        style.textContent = `
+                            #table-${tableIndex}.borderless th,
+                            #table-${tableIndex}.borderless td {
+                                border: none !important;
+                            }
+                            #table-${tableIndex}.borderless th {
+                                border-bottom: 1px solid rgba(255,255,255,0.2) !important;
+                            }
+                            #table-${tableIndex}.borderless td {
+                                border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+                            }
+                            [data-bs-theme="dark"] #table-${tableIndex}.borderless th {
+                                border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+                            }
+                            [data-bs-theme="dark"] #table-${tableIndex}.borderless td {
+                                border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+                            }
+                            #table-${tableIndex}.borderless tr:last-child td {
+                                border-bottom: none !important;
+                            }
+                        `;
+                        document.head.appendChild(style);
+                        
+                        // Also apply inline styles for immediate effect
+                        targetTable.querySelectorAll('th, td').forEach(cell => {
+                            cell.style.border = 'none';
+                        });
+                        
+                        targetTable.querySelectorAll('th').forEach(th => {
+                            th.style.borderBottom = '1px solid rgba(255,255,255,0.2)';
+                        });
+                        
+                        targetTable.querySelectorAll('td').forEach(td => {
+                            td.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+                        });
+                        
+                        // Check if dark mode
+                        if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
+                            targetTable.querySelectorAll('th').forEach(th => {
+                                th.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+                            });
+                            
+                            targetTable.querySelectorAll('td').forEach(td => {
+                                td.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                            });
+                        }
+                        
+                    } else {
+                        this.classList.remove('btn-outline-secondary');
+                        this.classList.add('btn-primary');
+                        this.setAttribute('title', 'Hide grid lines');
+                        this.innerHTML = '<i class="fas fa-border-all"></i> Grid On';
+                        
+                        // Remove borderless styles
+                        const style = document.getElementById(`borderless-style-${tableIndex}`);
+                        if (style) style.remove();
+                        
+                        // Restore grid styles
+                        const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+                        
+                        if (isDarkMode) {
+                            targetTable.querySelectorAll('th').forEach(th => {
+                                th.style.border = '1px solid rgba(255,255,255,0.15)';
+                            });
+                            
+                            targetTable.querySelectorAll('td').forEach(td => {
+                                td.style.border = '1px solid rgba(255,255,255,0.06)';
+                            });
+                        } else {
+                            targetTable.querySelectorAll('th').forEach(th => {
+                                th.style.border = '1px solid rgba(255,255,255,0.2)';
+                            });
+                            
+                            targetTable.querySelectorAll('td').forEach(td => {
+                                td.style.border = '1px solid rgba(0,0,0,0.07)';
+                            });
+                        }
+                    }
+                });
+                
+                // Add layout toggle functionality
+                const layoutBtn = controlPanel.querySelector('.table-layout-btn');
+                layoutBtn.addEventListener('click', function() {
+                    const targetTable = document.getElementById(this.getAttribute('data-target'));
+                    targetTable.classList.toggle('fixed-layout');
+                    
+                    if (targetTable.classList.contains('fixed-layout')) {
+                        this.classList.remove('btn-outline-secondary');
+                        this.classList.add('btn-outline-primary');
+                    } else {
+                        this.classList.remove('btn-outline-primary');
+                        this.classList.add('btn-outline-secondary');
+                    }
+                });
+                
+                // Add expand button functionality
+                const expandBtn = controlPanel.querySelector('.table-expand-btn');
+                expandBtn.addEventListener('click', function() {
+                    const tableWrapper = document.getElementById(this.getAttribute('data-target')).closest('.table-responsive');
+                    if (tableWrapper.classList.contains('table-fullwidth')) {
+                        tableWrapper.classList.remove('table-fullwidth');
+                        this.innerHTML = '<i class="fas fa-expand-alt"></i> Width';
+                        this.classList.remove('btn-outline-secondary');
+                        this.classList.add('btn-outline-primary');
+                    } else {
+                        tableWrapper.classList.add('table-fullwidth');
+                        this.innerHTML = '<i class="fas fa-compress-alt"></i> Width';
+                        this.classList.remove('btn-outline-primary');
+                        this.classList.add('btn-outline-secondary');
+                    }
+                });
+            }
+        });
+        
+        // Sort table function
+        function sortTable(table, columnIndex, headerElement) {
+            const sortDirection = headerElement.getAttribute('data-sort-direction');
+            const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            
+            // Reset all headers
+            table.querySelectorAll('th').forEach(th => {
+                th.setAttribute('data-sort-direction', 'none');
+                th.querySelector('.sort-icon').textContent = '';
+            });
+            
+            // Set current header
+            headerElement.setAttribute('data-sort-direction', newDirection);
+            headerElement.querySelector('.sort-icon').textContent = newDirection === 'asc' ? '↑' : '↓';
+            
+            // Get table rows and convert to array for sorting
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            // Sort rows
+            rows.sort((a, b) => {
+                const cellA = a.querySelectorAll('td')[columnIndex]?.textContent.trim() || '';
+                const cellB = b.querySelectorAll('td')[columnIndex]?.textContent.trim() || '';
+                
+                // Check if content is numeric
+                const isNumeric = !isNaN(cellA) && !isNaN(cellB);
+                
+                if (isNumeric) {
+                    return newDirection === 'asc' 
+                        ? parseFloat(cellA) - parseFloat(cellB)
+                        : parseFloat(cellB) - parseFloat(cellA);
+                } else {
+                    return newDirection === 'asc'
+                        ? cellA.localeCompare(cellB)
+                        : cellB.localeCompare(cellA);
+                }
+            });
+            
+            // Remove existing rows and add sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        // Filter table function
+        function filterTable(table, filterText) {
+            const tbody = table.querySelector('tbody');
+            const rows = tbody.querySelectorAll('tr');
+            const searchText = filterText.toLowerCase();
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Show message if no results
+            let noResultsMsg = table.nextElementSibling;
+            if (noResultsMsg && noResultsMsg.classList.contains('no-results-message')) {
+                noResultsMsg.remove();
+            }
+            
+            const visibleRows = tbody.querySelectorAll('tr[style=""]').length;
+            if (visibleRows === 0 && filterText.length > 0) {
+                noResultsMsg = document.createElement('div');
+                noResultsMsg.className = 'alert alert-info mt-2 no-results-message';
+                noResultsMsg.innerHTML = `No results found for "${filterText}"`;
+                table.parentNode.insertBefore(noResultsMsg, table.nextSibling);
             }
         }
         
-        // Add click handler for the fallback renderer button
-        document.getElementById('try-fallback').addEventListener('click', function() {
-            const mermaidDivs = document.querySelectorAll('.mermaid');
-            
-            mermaidDivs.forEach(function(div) {
-                const content = div.textContent.trim();
-                console.log("Using fallback for diagram:", content.substring(0, 100) + "...");
-                
-                // Make API call to the fallback renderer
-                fetch('/render-mermaid', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({diagram: content}),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Create an image element with the SVG URL
-                    div.innerHTML = `<img src="${data.svg_url}" alt="Mermaid Diagram" class="img-fluid">`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    div.innerHTML = `<div class="alert alert-danger">Failed to render diagram</div>`;
-                });
-            });
-        });
-        
-        // Reading experience enhancement
-        let fontSize = 16;
-        const content = document.getElementById('markdown-content');
-        
         // Font size controls
-        document.getElementById('zoom-in').addEventListener('click', function() {
-            fontSize += 2;
-            content.style.fontSize = fontSize + 'px';
-        });
+        const markdownContent = document.getElementById('markdown-content');
+        const decreaseBtn = document.getElementById('decrease-font');
+        const increaseBtn = document.getElementById('increase-font');
+        const fontSizeValue = document.getElementById('font-size-value');
         
-        document.getElementById('zoom-out').addEventListener('click', function() {
-            if (fontSize > 12) {
-                fontSize -= 2;
-                content.style.fontSize = fontSize + 'px';
+        let currentFontSize = 100;
+        
+        // Load saved font size from localStorage if available
+        if (localStorage.getItem('markdownFontSize')) {
+            currentFontSize = parseInt(localStorage.getItem('markdownFontSize'));
+            updateFontSize();
+        }
+        
+        function updateFontSize() {
+            markdownContent.style.fontSize = currentFontSize + '%';
+            fontSizeValue.textContent = currentFontSize + '%';
+            localStorage.setItem('markdownFontSize', currentFontSize);
+        }
+        
+        decreaseBtn.addEventListener('click', function() {
+            if (currentFontSize > 70) {
+                currentFontSize -= 10;
+                updateFontSize();
             }
         });
         
-        document.getElementById('zoom-reset').addEventListener('click', function() {
-            fontSize = 16;
-            content.style.fontSize = '';
+        increaseBtn.addEventListener('click', function() {
+            if (currentFontSize < 200) {
+                currentFontSize += 10;
+                updateFontSize();
+            }
+        });
+        
+        // Handle orientation change
+        window.addEventListener('orientationchange', function() {
+            // Give browser time to update orientation
+            setTimeout(function() {
+                if (window.matchMedia("(orientation: landscape) and (max-width: 992px)").matches) {
+                    document.querySelector('.document-title-container').classList.add('mt-5');
+                } else {
+                    document.querySelector('.document-title-container').classList.remove('mt-5');
+                }
+            }, 100);
+        });
+
+        // Check for table overflow to show scroll indicators
+        function checkTableOverflow() {
+            document.querySelectorAll('.table-responsive.custom-table-wrapper').forEach(wrapper => {
+                if (wrapper.scrollWidth > wrapper.clientWidth) {
+                    wrapper.classList.add('has-overflow');
+                } else {
+                    wrapper.classList.remove('has-overflow');
+                }
+            });
+        }
+
+        // Call on load and resize
+        checkTableOverflow();
+        window.addEventListener('resize', checkTableOverflow);
+
+        // Add scroll event listener to show/hide scroll indicator
+        document.querySelectorAll('.table-responsive.custom-table-wrapper').forEach(wrapper => {
+            wrapper.addEventListener('scroll', function() {
+                if (this.scrollLeft + this.clientWidth >= this.scrollWidth - 30) {
+                    this.classList.remove('has-overflow');
+                } else {
+                    if (this.scrollWidth > this.clientWidth) {
+                        this.classList.add('has-overflow');
+                    }
+                }
+            });
         });
     });
 </script>
