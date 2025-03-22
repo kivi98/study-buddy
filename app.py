@@ -145,7 +145,11 @@ def view_document(filepath):
     if content is None:
         abort(500)
     
-    return render_template('document.html', content=content, title=full_path.stem)
+    # Extract subject from filepath (first directory)
+    parts = filepath.split('/')
+    subject = parts[0] if parts else ''
+    
+    return render_template('document.html', content=content, title=full_path.stem, subject=subject)
 
 @app.route('/render-mermaid', methods=['POST'])
 def render_mermaid():
