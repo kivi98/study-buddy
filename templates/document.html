@@ -388,6 +388,392 @@
     [data-bs-theme="dark"] .table-responsive.custom-table-wrapper::after {
         background: linear-gradient(to right, rgba(0,0,0,0), rgba(255,255,255,0.05));
     }
+
+    /* Add these list enhancement styles after the table styles */
+    .markdown-body ul,
+    .markdown-body ol {
+        padding-left: 2rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .markdown-body ul {
+        list-style-type: disc;
+    }
+
+    .markdown-body ul ul {
+        list-style-type: circle;
+    }
+
+    .markdown-body ul ul ul {
+        list-style-type: square;
+    }
+
+    .markdown-body ol {
+        list-style-type: decimal;
+        counter-reset: item;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    .markdown-body ol > li {
+        counter-increment: item;
+        position: relative;
+        padding-left: 2.25rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .markdown-body ol > li::before {
+        content: counter(item) ".";
+        position: absolute;
+        left: 0.5rem;
+        font-weight: 600;
+        color: var(--bs-primary);
+    }
+
+    .markdown-body ol > li > strong:first-child,
+    .markdown-body ol > li > p > strong:first-child {
+        display: inline-block;
+        color: var(--bs-primary);
+        font-size: 1.15rem;
+        margin-bottom: 0.25rem;
+        font-weight: 700;
+    }
+
+    .markdown-body ol > li:nth-of-type(1),
+    .markdown-body ol > li:nth-of-type(5),
+    .markdown-body ol > li:nth-of-type(10),
+    .markdown-body ol > li:nth-of-type(14) {
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .markdown-body ol > li:nth-of-type(1):first-child {
+        margin-top: 0;
+    }
+
+    .markdown-body ol > li:nth-of-type(n+2):nth-of-type(-n+4),
+    .markdown-body ol > li:nth-of-type(n+6):nth-of-type(-n+9),
+    .markdown-body ol > li:nth-of-type(n+11):nth-of-type(-n+13),
+    .markdown-body ol > li:nth-of-type(n+15) {
+        padding-left: 3.5rem;
+    }
+
+    .markdown-body ol > li:nth-of-type(n+2):nth-of-type(-n+4)::before,
+    .markdown-body ol > li:nth-of-type(n+6):nth-of-type(-n+9)::before,
+    .markdown-body ol > li:nth-of-type(n+11):nth-of-type(-n+13)::before,
+    .markdown-body ol > li:nth-of-type(n+15)::before {
+        left: 1.75rem;
+    }
+
+    .markdown-body ol > li > ol {
+        margin-top: 0.5rem;
+        margin-bottom: 0;
+        counter-reset: subitem;
+    }
+
+    .markdown-body ol > li > ol > li {
+        counter-increment: subitem;
+        margin-bottom: 0.4rem;
+        padding-left: 2.5rem;
+    }
+
+    .markdown-body ol > li > ol > li::before {
+        content: counter(item) "." counter(subitem);
+        left: 0.5rem;
+    }
+
+    /* Handle third level */
+    .markdown-body ol > li > ol > li > ol {
+        counter-reset: subsubitem;
+        margin-top: 0.5rem;
+    }
+
+    .markdown-body ol > li > ol > li > ol > li {
+        counter-increment: subsubitem;
+        padding-left: 3rem;
+    }
+
+    .markdown-body ol > li > ol > li > ol > li::before {
+        content: counter(item) "." counter(subitem) "." counter(subsubitem);
+        left: 0.5rem;
+    }
+
+    /* Special styling for markdown headings followed by lists */
+    .markdown-body h1 + ol,
+    .markdown-body h2 + ol,
+    .markdown-body h3 + ol {
+        counter-reset: item;
+        margin-top: 1.25rem;
+    }
+
+    /* Add more padding to paragraph content in list items for better readability */
+    .markdown-body ol > li > p {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Fix for paragraphs containing strong elements in list items */
+    .markdown-body ol > li > p:first-child {
+        display: inline-block;
+    }
+
+    .markdown-body li {
+        margin-bottom: 0.5rem;
+        position: relative;
+        transition: transform 0.15s ease;
+    }
+
+    .markdown-body li:hover {
+        transform: translateX(2px);
+    }
+
+    .markdown-body li:last-child {
+        margin-bottom: 0;
+    }
+
+    .markdown-body li > p {
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    /* Nested list spacing */
+    .markdown-body li > ul,
+    .markdown-body li > ol {
+        margin-top: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Custom bullets for unordered lists */
+    .markdown-body ul li::marker {
+        color: var(--bs-primary);
+    }
+
+    .markdown-body ul ul li::marker {
+        color: rgba(var(--bs-primary-rgb), 0.8);
+    }
+
+    .markdown-body ul ul ul li::marker {
+        color: rgba(var(--bs-primary-rgb), 0.6);
+    }
+
+    /* Custom number styling for ordered lists */
+    .markdown-body ol li::marker {
+        color: var(--bs-primary);
+        font-weight: 600;
+    }
+
+    .markdown-body ol ol li::marker {
+        color: rgba(var(--bs-primary-rgb), 0.8);
+    }
+
+    .markdown-body ol ol ol li::marker {
+        color: rgba(var(--bs-primary-rgb), 0.6);
+    }
+
+    /* Task lists (checkboxes) */
+    .markdown-body ul.contains-task-list {
+        padding-left: 0.5rem;
+        list-style-type: none;
+    }
+
+    .markdown-body ul.contains-task-list li {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .markdown-body ul.contains-task-list li input[type="checkbox"] {
+        position: absolute;
+        left: 0;
+        top: 0.3rem;
+        margin: 0;
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+
+    .markdown-body ul.contains-task-list li.task-list-item-checked {
+        color: #6c757d;
+        text-decoration: line-through;
+    }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 576px) {
+        .markdown-body ul,
+        .markdown-body ol {
+            padding-left: 1.5rem;
+        }
+        
+        .markdown-body li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .markdown-body li > ul,
+        .markdown-body li > ol {
+            padding-left: 1.25rem;
+        }
+    }
+
+    /* Dark mode specific adjustments */
+    [data-bs-theme="dark"] .markdown-body ul li::marker {
+        color: var(--bs-primary);
+    }
+
+    [data-bs-theme="dark"] .markdown-body ol li::marker {
+        color: var(--bs-primary);
+    }
+
+    [data-bs-theme="dark"] .markdown-body ul.contains-task-list li.task-list-item-checked {
+        color: #adb5bd;
+    }
+
+    /* Additional styles for nested ordered lists */
+    .markdown-body ol ol {
+        padding-left: 1.5rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .markdown-body ol ol > li {
+        padding-left: 2rem;
+    }
+
+    .markdown-body ol ol > li::before {
+        left: 0.25rem;
+    }
+
+    /* Visual enhancement for design document structure */
+    .markdown-body h2 + ol {
+        margin-top: 1.5rem;
+    }
+
+    /* Strong text at beginning of list items */
+    .markdown-body ol > li > strong {
+        color: var(--bs-primary);
+        font-weight: 600;
+    }
+
+    /* Design document specific styles */
+    .markdown-body h1 + ol,
+    .markdown-body h2 + ol,
+    .markdown-body h3 + ol {
+        counter-reset: section;
+    }
+
+    .markdown-body ol > li.section-header {
+        font-weight: 600;
+        font-size: 1.15rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--bs-primary);
+        padding-left: 0;
+    }
+
+    .markdown-body ol > li.section-header::before {
+        content: none;
+    }
+
+    /* Fix for the section indentation and spacing */
+    .markdown-body ol > li.section-item {
+        padding-left: 3.5rem;
+    }
+
+    .markdown-body ol > li.section-item::before {
+        left: 1.75rem;
+    }
+
+    /* Document structure list (like Design Document Components) */
+    .markdown-body ol.document-structure {
+        counter-reset: section;
+        padding-left: 0.5rem;
+    }
+
+    .markdown-body ol.document-structure > li {
+        position: relative;
+        margin-bottom: 0.65rem;
+        list-style: none;
+        padding-left: 2.5rem;
+    }
+
+    .markdown-body ol.document-structure > li::before {
+        content: counter(section) ".";
+        counter-increment: section;
+        position: absolute;
+        left: 0.5rem;
+        color: var(--bs-primary);
+        font-weight: 600;
+    }
+
+    /* Section headers in document structure */
+    .markdown-body ol.document-structure > li.section-header {
+        margin-top: 1.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--bs-primary);
+    }
+
+    .markdown-body ol.document-structure > li.section-header::before {
+        content: counter(section) ".";
+        font-weight: 600;
+    }
+
+    /* Items under section headers */
+    .markdown-body ol.document-structure > li.section-item {
+        padding-left: 3.5rem;
+    }
+
+    .markdown-body ol.document-structure > li.section-item::before {
+        left: 1.75rem;
+    }
+
+    /* Special formatting for key document sections */
+    .markdown-body ol.document-structure > li.section-header:first-child,
+    .markdown-body ol.document-structure > li:nth-child(5),
+    .markdown-body ol.document-structure > li:nth-child(10),
+    .markdown-body ol.document-structure > li:nth-child(14) {
+        font-weight: 700;
+        color: var(--bs-primary);
+        margin-top: 1.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Better spacing for document structure lists */
+    .markdown-body ol.document-structure {
+        margin-top: 1.5rem;
+    }
+
+    /* Special styling for document structure headings */
+    .markdown-body h1 + ol.document-structure,
+    .markdown-body h2 + ol.document-structure {
+        margin-top: 1.25rem;
+    }
+
+    /* Key document headings (like System Architecture, Detailed Design) */
+    .markdown-body ol > li:first-child > p > strong:first-child,
+    .markdown-body ol > li:nth-of-type(5) > p > strong:first-child,
+    .markdown-body ol > li:nth-of-type(10) > p > strong:first-child,
+    .markdown-body ol > li:nth-of-type(14) > p > strong:first-child {
+        font-size: 1.25rem;
+        color: var(--bs-primary);
+        font-weight: 700;
+        border-bottom: 2px solid rgba(var(--bs-primary-rgb), 0.2);
+        padding-bottom: 0.25rem;
+        display: inline-block;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Fix counter increments in Markdown rendering */
+    .markdown-body ol {
+        counter-reset: item;
+    }
+
+    .markdown-body ol > li {
+        counter-increment: item;
+    }
+
+    /* Special handling for main list with document sections */
+    .markdown-body > ol:first-of-type {
+        margin-bottom: 2rem;
+    }
 </style>
 {% endblock %}
 
@@ -923,6 +1309,76 @@
                 }
             });
         });
+
+        // Add list structure detection after all other document processing
+        // Detect and format document structure lists (like the Design Document Components)
+        function enhanceDocumentStructureLists() {
+            const contentDiv = document.getElementById('markdown-content');
+            
+            // Look for ordered lists that might be document structures
+            contentDiv.querySelectorAll('ol').forEach(list => {
+                // Check if this is a top-level list
+                if (!list.closest('li')) {
+                    const items = list.querySelectorAll('li');
+                    if (items.length >= 8) { // Minimum items for a structured document
+                        
+                        // Check for patterns that suggest this is a structured document list
+                        let isStructuredDocument = false;
+                        let sectionHeaders = [];
+                        
+                        // Look for items that might be section headers (contain strong text or have significantly fewer words)
+                        items.forEach((item, index) => {
+                            const text = item.textContent.trim();
+                            const words = text.split(/\s+/);
+                            
+                            // Check if item starts with a strong/bold text
+                            const strongElem = item.querySelector('strong');
+                            if (strongElem && strongElem.textContent.trim().length > 10) {
+                                sectionHeaders.push(index);
+                                isStructuredDocument = true;
+                            }
+                            // Or if item is short and followed by indented items
+                            else if (words.length <= 5 && index < items.length - 1) {
+                                // Check if next item appears to be indented or part of a section
+                                const nextItem = items[index + 1];
+                                if (nextItem && nextItem.textContent.trim().split(/\s+/).length > 5) {
+                                    sectionHeaders.push(index);
+                                    isStructuredDocument = true;
+                                }
+                            }
+                        });
+                        
+                        if (isStructuredDocument) {
+                            // Add classes for styling continuous numbering and sections
+                            list.classList.add('document-structure');
+                            
+                            // Apply specific classes to section headers and their items
+                            sectionHeaders.forEach((headerIndex, sectionIndex) => {
+                                const sectionItem = items[headerIndex];
+                                sectionItem.classList.add('section-header');
+                                
+                                // Get end of this section
+                                const nextSectionIndex = sectionIndex < sectionHeaders.length - 1 ? 
+                                    sectionHeaders[sectionIndex + 1] : items.length;
+                                
+                                // Mark items in this section
+                                for (let i = headerIndex + 1; i < nextSectionIndex; i++) {
+                                    if (items[i]) {
+                                        items[i].classList.add('section-item');
+                                    }
+                                }
+                            });
+                            
+                            // Add custom attribute to enable CSS targeting
+                            list.setAttribute('data-structure-type', 'document');
+                        }
+                    }
+                }
+            });
+        }
+
+        // Call the function after the document is fully loaded
+        setTimeout(enhanceDocumentStructureLists, 300);
     });
 </script>
 
