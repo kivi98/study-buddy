@@ -1,332 +1,373 @@
 # Complexity Analysis
 
-[Back to Course Content](README.md) | [← Previous: Dynamic Programming](dynamic-programming.md) | [Next: Concurrency →](concurrency.md)
+[Back to Course Content](README.md) | [Previous: Searching Algorithms](searching.md) | [Next: Recursion →](recursion.md)
 
-## Introduction to Complexity Analysis
+> Reference: This content is based on Complexity-analysis.pdf and Algorithm-analysis.pdf
 
-Complexity analysis is the study of how algorithms perform as their input size grows. It helps us understand the efficiency and scalability of algorithms.
+## What is Complexity Analysis?
 
-### Complexity Analysis Process
+Complexity analysis is the study of how the performance of an algorithm changes with the size of the input. It helps us understand the efficiency and scalability of algorithms.
 
 ```mermaid
-graph TD
-    A[Algorithm] --> B[Identify Operations]
-    B --> C[Count Operations]
-    C --> D[Find Growth Rate]
-    D --> E[Time Complexity]
-    D --> F[Space Complexity]
-    E --> G[Big O Notation]
-    F --> G
-    G --> H[Algorithm Comparison]
+mindmap
+    root((Complexity Analysis))
+        Time Complexity
+            Best Case
+            Average Case
+            Worst Case
+        Space Complexity
+            Auxiliary Space
+            Input Space
+        Analysis Methods
+            Big O
+            Big Omega
+            Big Theta
+        Applications
+            Algorithm Selection
+            Performance Optimization
+            Resource Planning
 ```
 
-### Key Concepts
+## Big O Notation
 
-| Concept | Description |
-|---------|-------------|
-| Time Complexity | How runtime grows with input size |
-| Space Complexity | How memory usage grows with input size |
-| Big O Notation | Upper bound of growth rate |
-| Big Omega | Lower bound of growth rate |
-| Big Theta | Tight bound of growth rate |
-| Asymptotic Analysis | Analysis for large input sizes |
+### What is Big O?
 
-## Common Time Complexities
+Big O notation describes the upper bound of an algorithm's growth rate. It represents the worst-case scenario of an algorithm's performance.
 
-### 1. Constant Time O(1)
+### Common Time Complexities
+
+1. **Constant Time - O(1)**
+   ```java
+   public int getFirst(int[] arr) {
+       return arr[0];
+   }
+   ```
+
+2. **Logarithmic Time - O(log n)**
+   ```java
+   public int binarySearch(int[] arr, int target) {
+       int left = 0;
+       int right = arr.length - 1;
+       
+       while (left <= right) {
+           int mid = left + (right - left) / 2;
+           if (arr[mid] == target) return mid;
+           if (arr[mid] < target) left = mid + 1;
+           else right = mid - 1;
+       }
+       return -1;
+   }
+   ```
+
+3. **Linear Time - O(n)**
+   ```java
+   public int findMax(int[] arr) {
+       int max = arr[0];
+       for (int i = 1; i < arr.length; i++) {
+           if (arr[i] > max) max = arr[i];
+       }
+       return max;
+   }
+   ```
+
+4. **Linearithmic Time - O(n log n)**
+   ```java
+   public void mergeSort(int[] arr) {
+       if (arr.length <= 1) return;
+       int mid = arr.length / 2;
+       int[] left = Arrays.copyOfRange(arr, 0, mid);
+       int[] right = Arrays.copyOfRange(arr, mid, arr.length);
+       mergeSort(left);
+       mergeSort(right);
+       merge(arr, left, right);
+   }
+   ```
+
+5. **Quadratic Time - O(n²)**
+   ```java
+   public void bubbleSort(int[] arr) {
+       for (int i = 0; i < arr.length - 1; i++) {
+           for (int j = 0; j < arr.length - i - 1; j++) {
+               if (arr[j] > arr[j + 1]) {
+                   int temp = arr[j];
+                   arr[j] = arr[j + 1];
+                   arr[j + 1] = temp;
+               }
+           }
+       }
+   }
+   ```
+
+6. **Exponential Time - O(2ⁿ)**
+   ```java
+   public int fibonacci(int n) {
+       if (n <= 1) return n;
+       return fibonacci(n - 1) + fibonacci(n - 2);
+   }
+   ```
+
+7. **Factorial Time - O(n!)**
+   ```java
+   public void generatePermutations(String str) {
+       generatePermutationsHelper("", str);
+   }
+
+   private void generatePermutationsHelper(String prefix, String str) {
+       int n = str.length();
+       if (n == 0) {
+           System.out.println(prefix);
+           return;
+       }
+       for (int i = 0; i < n; i++) {
+           generatePermutationsHelper(prefix + str.charAt(i),
+               str.substring(0, i) + str.substring(i + 1));
+       }
+   }
+   ```
+
+## Space Complexity
+
+### Types of Space Complexity
+
+1. **Input Space**
+   - Space required to store input data
+   - Example: Array, matrix, graph
+
+2. **Auxiliary Space**
+   - Extra space used by algorithm
+   - Example: Temporary variables, recursion stack
+
+### Common Space Complexities
+
+1. **Constant Space - O(1)**
+   ```java
+   public int sum(int[] arr) {
+       int sum = 0;
+       for (int num : arr) {
+           sum += num;
+       }
+       return sum;
+   }
+   ```
+
+2. **Linear Space - O(n)**
+   ```java
+   public int[] reverse(int[] arr) {
+       int[] result = new int[arr.length];
+       for (int i = 0; i < arr.length; i++) {
+           result[i] = arr[arr.length - 1 - i];
+       }
+       return result;
+   }
+   ```
+
+3. **Quadratic Space - O(n²)**
+   ```java
+   public int[][] transpose(int[][] matrix) {
+       int rows = matrix.length;
+       int cols = matrix[0].length;
+       int[][] result = new int[cols][rows];
+       for (int i = 0; i < rows; i++) {
+           for (int j = 0; j < cols; j++) {
+               result[j][i] = matrix[i][j];
+           }
+       }
+       return result;
+   }
+   ```
+
+## Analysis Methods
+
+### 1. Big O (Upper Bound)
 
 ```java
-public class ConstantTime {
-    public static int getFirstElement(int[] arr) {
-        return arr[0];
+// Example: O(n) algorithm
+public boolean linearSearch(int[] arr, int target) {
+    for (int num : arr) {
+        if (num == target) return true;
     }
-    
-    public static void swap(int a, int b) {
-        int temp = a;
-        a = b;
-        b = temp;
-    }
+    return false;
 }
 ```
 
-### 2. Logarithmic Time O(log n)
+### 2. Big Omega (Lower Bound)
 
 ```java
-public class BinarySearch {
-    public static int binarySearch(int[] arr, int target) {
-        int left = 0;
-        int right = arr.length - 1;
-        
-        while (left <= right) {
-            int mid = (left + right) / 2;
-            if (arr[mid] == target) {
-                return mid;
-            } else if (arr[mid] > target) {
-                right = mid - 1;
-            } else {
-                left = mid + 1;
-            }
-        }
-        return -1;
+// Example: Ω(log n) algorithm
+public int binarySearch(int[] arr, int target) {
+    int left = 0;
+    int right = arr.length - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] == target) return mid;
+        if (arr[mid] < target) left = mid + 1;
+        else right = mid - 1;
     }
+    return -1;
 }
 ```
 
-### 3. Linear Time O(n)
+### 3. Big Theta (Tight Bound)
 
 ```java
-public class LinearTime {
-    public static int findMax(int[] arr) {
-        int maxVal = arr[0];
-        for (int num : arr) {
-            if (num > maxVal) {
-                maxVal = num;
-            }
-        }
-        return maxVal;
+// Example: Θ(n) algorithm
+public int sum(int[] arr) {
+    int sum = 0;
+    for (int num : arr) {
+        sum += num;
     }
+    return sum;
 }
 ```
 
-### 4. Linearithmic Time O(n log n)
+## Recurrence Relations
 
-```java
-public class MergeSort {
-    public static int[] mergeSort(int[] arr) {
-        if (arr.length <= 1) {
-            return arr;
-        }
-        
-        int mid = arr.length / 2;
-        int[] left = new int[mid];
-        int[] right = new int[arr.length - mid];
-        
-        System.arraycopy(arr, 0, left, 0, mid);
-        System.arraycopy(arr, mid, right, 0, arr.length - mid);
-        
-        left = mergeSort(left);
-        right = mergeSort(right);
-        
-        return merge(left, right);
-    }
-    
-    private static int[] merge(int[] left, int[] right) {
-        int[] result = new int[left.length + right.length];
-        int i = 0, j = 0, k = 0;
-        
-        while (i < left.length && j < right.length) {
-            if (left[i] <= right[j]) {
-                result[k++] = left[i++];
-            } else {
-                result[k++] = right[j++];
-            }
-        }
-        
-        while (i < left.length) {
-            result[k++] = left[i++];
-        }
-        
-        while (j < right.length) {
-            result[k++] = right[j++];
-        }
-        
-        return result;
-    }
-}
-```
+### Common Recurrence Relations
 
-### 5. Quadratic Time O(n²)
+1. **Binary Search**
+   ```
+   T(n) = T(n/2) + c
+   Solution: T(n) = O(log n)
+   ```
 
-```java
-public class BubbleSort {
-    public static void bubbleSort(int[] arr) {
-        int n = arr.length;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (arr[j] > arr[j + 1]) {
-                    int temp = arr[j];
-                    arr[j] = arr[j + 1];
-                    arr[j + 1] = temp;
-                }
-            }
-        }
-    }
-}
-```
+2. **Merge Sort**
+   ```
+   T(n) = 2T(n/2) + n
+   Solution: T(n) = O(n log n)
+   ```
 
-### 6. Exponential Time O(2ⁿ)
+3. **Quick Sort (Average Case)**
+   ```
+   T(n) = T(n/2) + T(n/2) + n
+   Solution: T(n) = O(n log n)
+   ```
 
-```java
-public class Fibonacci {
-    public static int fibonacciRecursive(int n) {
-        if (n <= 1) {
-            return n;
-        }
-        return fibonacciRecursive(n-1) + fibonacciRecursive(n-2);
-    }
-}
-```
+4. **Quick Sort (Worst Case)**
+   ```
+   T(n) = T(n-1) + n
+   Solution: T(n) = O(n²)
+   ```
 
-## Space Complexity Analysis
+## Amortized Analysis
 
-### 1. Constant Space O(1)
+### Methods of Amortized Analysis
 
-```java
-public class ConstantSpace {
-    public static int sumArray(int[] arr) {
-        int total = 0;
-        for (int num : arr) {
-            total += num;
-        }
-        return total;
-    }
-}
-```
+1. **Aggregate Method**
+   ```java
+   // Example: Dynamic Array
+   public class DynamicArray {
+       private int[] arr;
+       private int size;
+       private int capacity;
 
-### 2. Linear Space O(n)
+       public DynamicArray() {
+           capacity = 1;
+           arr = new int[capacity];
+           size = 0;
+       }
 
-```java
-public class LinearSpace {
-    public static int[] reverseArray(int[] arr) {
-        int[] result = new int[arr.length];
-        for (int i = 0; i < arr.length; i++) {
-            result[i] = arr[arr.length - 1 - i];
-        }
-        return result;
-    }
-}
-```
+       public void push(int x) {
+           if (size == capacity) {
+               int[] newArr = new int[2 * capacity];
+               for (int i = 0; i < size; i++) {
+                   newArr[i] = arr[i];
+               }
+               arr = newArr;
+               capacity *= 2;
+           }
+           arr[size++] = x;
+       }
+   }
+   ```
 
-### 3. Quadratic Space O(n²)
+2. **Accounting Method**
+   ```java
+   // Example: Stack with MultiPop
+   public class Stack {
+       private int[] arr;
+       private int top;
 
-```java
-public class QuadraticSpace {
-    public static int[][] createMatrix(int n) {
-        return new int[n][n];
-    }
-}
-```
+       public void multiPop(int k) {
+           while (!isEmpty() && k > 0) {
+               pop();
+               k--;
+           }
+       }
+   }
+   ```
 
-## Complexity Analysis Techniques
+3. **Potential Method**
+   ```java
+   // Example: Binary Counter
+   public class BinaryCounter {
+       private int[] counter;
+       private int value;
 
-### 1. Counting Operations
-
-```java
-public class OperationCounter {
-    public static int countOperations(int[] arr) {
-        int n = arr.length;
-        int operations = 0;
-        
-        for (int i = 0; i < n; i++) {
-            operations++; // Loop iteration
-            for (int j = 0; j < n; j++) {
-                operations++; // Inner loop iteration
-                if (arr[i] > arr[j]) {
-                    operations++; // Comparison
-                    operations++; // Swap
-                }
-            }
-        }
-        
-        return operations;
-    }
-}
-```
-
-### 2. Recurrence Relations
-
-```java
-public class RecurrenceRelations {
-    public static int solveRecurrence(int n) {
-        if (n <= 1) {
-            return 1;
-        }
-        return 2 * solveRecurrence(n/2) + n;
-    }
-}
-```
-
-### 3. Master Theorem
-
-```java
-public class MasterTheorem {
-    public static int masterTheoremExample(int n) {
-        if (n <= 1) {
-            return 1;
-        }
-        return 4 * masterTheoremExample(n/2) + n;
-    }
-}
-```
-
-## Real-World Applications
-
-### 1. Algorithm Selection
-- Choosing appropriate algorithms
-- Performance optimization
-- Resource allocation
-- System design
-
-### 2. System Design
-- Scalability planning
-- Resource estimation
-- Performance tuning
-- Load balancing
-
-### 3. Code Optimization
-- Identifying bottlenecks
-- Improving efficiency
-- Reducing memory usage
-- Enhancing performance
-
-### 4. Problem Solving
-- Algorithm design
-- Solution comparison
-- Performance prediction
-- Resource management
-
-## Implementation Considerations
-
-### Memory Management
-1. Space-time tradeoffs
-2. Memory allocation
-3. Cache utilization
-4. Garbage collection
-
-### Performance Optimization
-1. Algorithm selection
-2. Data structure choice
-3. Implementation details
-4. Hardware utilization
+       public void increment() {
+           int i = 0;
+           while (i < counter.length && counter[i] == 1) {
+               counter[i] = 0;
+               i++;
+           }
+           if (i < counter.length) {
+               counter[i] = 1;
+           }
+       }
+   }
+   ```
 
 ## Best Practices
 
-### Analysis
-1. Identify key operations
-2. Count operations
-3. Find growth rate
-4. Consider worst case
+1. **Analysis Process**
+   - Identify input size
+   - Count basic operations
+   - Express as function of input size
+   - Find asymptotic behavior
+   - Consider all cases
 
-### Implementation
-1. Choose efficient algorithms
-2. Optimize space usage
-3. Consider tradeoffs
-4. Profile performance
+2. **Implementation**
+   - Choose appropriate data structures
+   - Optimize critical paths
+   - Consider memory constraints
+   - Handle edge cases
 
-## Summary
+3. **Documentation**
+   - Document complexity
+   - Explain assumptions
+   - Provide examples
+   - Include edge cases
 
-Key points to remember:
-1. Analyze growth rates
-2. Consider worst cases
-3. Compare algorithms
-4. Optimize resources
-5. Balance tradeoffs
-6. Profile performance
+## Common Pitfalls
 
-By understanding complexity analysis, you can:
-- Choose efficient algorithms
-- Optimize performance
-- Design scalable systems
-- Solve complex problems
-- Manage resources
-- Improve code quality 
+1. **Analysis Mistakes**
+   - Ignoring constants
+   - Confusing cases
+   - Missing terms
+   - Incorrect bounds
+
+2. **Implementation Issues**
+   - Inefficient operations
+   - Memory leaks
+   - Unnecessary copies
+   - Poor data structures
+
+3. **Optimization Problems**
+   - Premature optimization
+   - Over-optimization
+   - Wrong metrics
+   - Ignoring trade-offs
+
+## Exercises
+
+1. Analyze the complexity of a given algorithm
+2. Solve recurrence relations
+3. Perform amortized analysis
+4. Compare algorithm complexities
+5. Optimize given code
+
+## Additional Resources
+
+- [GeeksforGeeks - Complexity Analysis](https://www.geeksforgeeks.org/analysis-of-algorithms-set-1-asymptotic-analysis/)
+- [Big O Cheat Sheet](https://www.bigocheatsheet.com/)
+- [Algorithm Analysis](https://www.cs.cmu.edu/~adamchik/15-121/lectures/Algorithmic%20Complexity/complexity.html)
+- [Complexity Analysis Guide](https://www.programiz.com/dsa/algorithm-complexity) 

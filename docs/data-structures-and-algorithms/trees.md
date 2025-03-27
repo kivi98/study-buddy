@@ -1,104 +1,57 @@
 # Trees and Binary Trees
 
-[Back to Course Content](README.md) | [← Previous: Stacks and Queues](stacks-queues.md) | [Next: Advanced Trees →](advanced-trees.md)
+[Back to Course Content](README.md) | [Previous: Stacks and Queues](stacks-and-queues.md) | [Next: Graphs →](graphs.md)
 
-## Trees
+> Reference: This content is based on Binary-trees.pdf and Red-Black-tree.pdf
 
-A tree is a hierarchical data structure consisting of nodes connected by edges. Each node can have multiple children, but only one parent.
+## What are Trees?
 
-### Tree Characteristics
+Trees are hierarchical data structures that represent relationships between elements. They consist of nodes connected by edges, with one node designated as the root.
 
 ```mermaid
-graph TD
-    A[Tree] --> B[Root Node]
-    A --> C[Parent-Child Relationship]
-    A --> D[Hierarchical Structure]
-    B --> E[Top Level]
-    C --> F[One Parent]
-    C --> G[Multiple Children]
-    D --> H[Levels]
-    D --> I[Depth]
+mindmap
+    root((Trees))
+        Binary Trees
+            BST
+            AVL
+            Red-Black
+        N-ary Trees
+            General trees
+            B-trees
+        Special Trees
+            Heap
+            Trie
+            Segment Tree
 ```
+
+## Basic Tree Concepts
 
 ### Tree Terminology
 
-| Term | Description |
-|------|-------------|
-| Root | Topmost node |
-| Parent | Node with children |
-| Child | Node connected to parent |
-| Leaf | Node with no children |
-| Internal Node | Node with at least one child |
-| Sibling | Nodes with same parent |
-| Ancestor | Parent of parent |
-| Descendant | Child of child |
-| Level | Distance from root |
-| Height | Maximum level |
-| Depth | Distance from root to node |
+- **Root**: Topmost node
+- **Parent**: Node with children
+- **Child**: Node connected to parent
+- **Sibling**: Nodes with same parent
+- **Leaf**: Node with no children
+- **Internal Node**: Node with children
+- **Height**: Length of path from root to deepest leaf
+- **Depth**: Length of path from root to a node
+- **Level**: Set of nodes at same depth
 
-### Tree Operations
+### Tree Properties
 
-| Operation | Time Complexity | Space Complexity | Description |
-|-----------|----------------|------------------|-------------|
-| Insert | O(n) | O(1) | Add new node |
-| Delete | O(n) | O(1) | Remove node |
-| Search | O(n) | O(1) | Find node |
-| Traverse | O(n) | O(n) | Visit all nodes |
-
-### Tree Implementation
-
-```python
-class TreeNode:
-    def __init__(self, data):
-        self.data = data
-        self.children = []
-    
-    def add_child(self, child):
-        self.children.append(child)
-    
-    def remove_child(self, child):
-        if child in self.children:
-            self.children.remove(child)
-
-class Tree:
-    def __init__(self, root_data):
-        self.root = TreeNode(root_data)
-    
-    def add_node(self, parent_data, child_data):
-        parent = self.find_node(self.root, parent_data)
-        if parent:
-            parent.add_child(TreeNode(child_data))
-            return True
-        return False
-    
-    def find_node(self, node, data):
-        if node.data == data:
-            return node
-        for child in node.children:
-            found = self.find_node(child, data)
-            if found:
-                return found
-        return None
-```
+1. **Connected**: Path exists between any two nodes
+2. **Acyclic**: No cycles in the tree
+3. **Single Root**: One root node
+4. **Unique Path**: One path between any two nodes
 
 ## Binary Trees
 
+### What is a Binary Tree?
+
 A binary tree is a tree where each node has at most two children, referred to as left child and right child.
 
-### Binary Tree Characteristics
-
-```mermaid
-graph TD
-    A[Binary Tree] --> B[Maximum 2 Children]
-    A --> C[Left and Right]
-    A --> D[Ordered Structure]
-    B --> E[Left Child]
-    B --> F[Right Child]
-    C --> G[Binary Search]
-    D --> H[Traversal Order]
-```
-
-### Binary Tree Types
+#### Types of Binary Trees
 
 1. **Full Binary Tree**
    - Every node has 0 or 2 children
@@ -113,211 +66,500 @@ graph TD
    - All leaves at same level
 
 4. **Balanced Binary Tree**
-   - Height difference ≤ 1
-   - Left and right subtrees balanced
+   - Height difference between left and right subtrees ≤ 1
+   - Maintains O(log n) height
 
-### Binary Tree Operations
+### Java Implementation
 
-| Operation | Time Complexity | Space Complexity | Description |
-|-----------|----------------|------------------|-------------|
-| Insert | O(log n) | O(1) | Add new node |
-| Delete | O(log n) | O(1) | Remove node |
-| Search | O(log n) | O(1) | Find node |
-| Traverse | O(n) | O(n) | Visit all nodes |
+```java
+public class BinaryTree<T> {
+    private static class Node<T> {
+        T data;
+        Node<T> left;
+        Node<T> right;
 
-### Binary Tree Implementation
+        Node(T data) {
+            this.data = data;
+            this.left = null;
+            this.right = null;
+        }
+    }
 
-```python
-class BinaryTreeNode:
-    def __init__(self, data):
-        self.data = data
-        self.left = None
-        self.right = None
+    private Node<T> root;
 
-class BinaryTree:
-    def __init__(self, root_data):
-        self.root = BinaryTreeNode(root_data)
-    
-    def insert(self, data):
-        if not self.root:
-            self.root = BinaryTreeNode(data)
-            return
-        
-        queue = [self.root]
-        while queue:
-            node = queue.pop(0)
-            if not node.left:
-                node.left = BinaryTreeNode(data)
-                return
-            if not node.right:
-                node.right = BinaryTreeNode(data)
-                return
-            queue.append(node.left)
-            queue.append(node.right)
-    
-    def search(self, data):
-        if not self.root:
-            return False
-        
-        queue = [self.root]
-        while queue:
-            node = queue.pop(0)
-            if node.data == data:
-                return True
-            if node.left:
-                queue.append(node.left)
-            if node.right:
-                queue.append(node.right)
-        return False
+    public BinaryTree() {
+        root = null;
+    }
+
+    public void insert(T data) {
+        root = insertRec(root, data);
+    }
+
+    private Node<T> insertRec(Node<T> root, T data) {
+        if (root == null) {
+            root = new Node<>(data);
+            return root;
+        }
+
+        if (data.compareTo(root.data) < 0) {
+            root.left = insertRec(root.left, data);
+        } else if (data.compareTo(root.data) > 0) {
+            root.right = insertRec(root.right, data);
+        }
+
+        return root;
+    }
+
+    public void inorderTraversal() {
+        inorderRec(root);
+    }
+
+    private void inorderRec(Node<T> root) {
+        if (root != null) {
+            inorderRec(root.left);
+            System.out.print(root.data + " ");
+            inorderRec(root.right);
+        }
+    }
+
+    public void preorderTraversal() {
+        preorderRec(root);
+    }
+
+    private void preorderRec(Node<T> root) {
+        if (root != null) {
+            System.out.print(root.data + " ");
+            preorderRec(root.left);
+            preorderRec(root.right);
+        }
+    }
+
+    public void postorderTraversal() {
+        postorderRec(root);
+    }
+
+    private void postorderRec(Node<T> root) {
+        if (root != null) {
+            postorderRec(root.left);
+            postorderRec(root.right);
+            System.out.print(root.data + " ");
+        }
+    }
+
+    public int height() {
+        return heightRec(root);
+    }
+
+    private int heightRec(Node<T> root) {
+        if (root == null) {
+            return -1;
+        }
+        return Math.max(heightRec(root.left), heightRec(root.right)) + 1;
+    }
+
+    public int size() {
+        return sizeRec(root);
+    }
+
+    private int sizeRec(Node<T> root) {
+        if (root == null) {
+            return 0;
+        }
+        return sizeRec(root.left) + sizeRec(root.right) + 1;
+    }
+}
 ```
 
-## Tree Traversals
+## Binary Search Trees (BST)
 
-### Depth-First Traversals
+### What is a BST?
 
-1. **Preorder (Root → Left → Right)**
-```python
-def preorder_traversal(node):
-    if node:
-        print(node.data)
-        preorder_traversal(node.left)
-        preorder_traversal(node.right)
+A binary search tree is a binary tree where:
+- Left subtree contains only nodes with keys less than node's key
+- Right subtree contains only nodes with keys greater than node's key
+- Both left and right subtrees are also BSTs
+
+### BST Operations
+
+| Operation | Average Case | Worst Case |
+|-----------|--------------|------------|
+| Search | O(log n) | O(n) |
+| Insert | O(log n) | O(n) |
+| Delete | O(log n) | O(n) |
+| Find Min/Max | O(log n) | O(n) |
+
+### Java Implementation
+
+```java
+public class BinarySearchTree<T extends Comparable<T>> {
+    private static class Node<T> {
+        T data;
+        Node<T> left;
+        Node<T> right;
+
+        Node(T data) {
+            this.data = data;
+            this.left = null;
+            this.right = null;
+        }
+    }
+
+    private Node<T> root;
+
+    public BinarySearchTree() {
+        root = null;
+    }
+
+    public void insert(T data) {
+        root = insertRec(root, data);
+    }
+
+    private Node<T> insertRec(Node<T> root, T data) {
+        if (root == null) {
+            root = new Node<>(data);
+            return root;
+        }
+
+        if (data.compareTo(root.data) < 0) {
+            root.left = insertRec(root.left, data);
+        } else if (data.compareTo(root.data) > 0) {
+            root.right = insertRec(root.right, data);
+        }
+
+        return root;
+    }
+
+    public boolean search(T data) {
+        return searchRec(root, data);
+    }
+
+    private boolean searchRec(Node<T> root, T data) {
+        if (root == null || root.data.equals(data)) {
+            return root != null;
+        }
+
+        if (data.compareTo(root.data) < 0) {
+            return searchRec(root.left, data);
+        }
+
+        return searchRec(root.right, data);
+    }
+
+    public void delete(T data) {
+        root = deleteRec(root, data);
+    }
+
+    private Node<T> deleteRec(Node<T> root, T data) {
+        if (root == null) {
+            return root;
+        }
+
+        if (data.compareTo(root.data) < 0) {
+            root.left = deleteRec(root.left, data);
+        } else if (data.compareTo(root.data) > 0) {
+            root.right = deleteRec(root.right, data);
+        } else {
+            // Node with only one child or no child
+            if (root.left == null) {
+                return root.right;
+            } else if (root.right == null) {
+                return root.left;
+            }
+
+            // Node with two children
+            root.data = minValue(root.right);
+            root.right = deleteRec(root.right, root.data);
+        }
+
+        return root;
+    }
+
+    private T minValue(Node<T> root) {
+        T minv = root.data;
+        while (root.left != null) {
+            minv = root.left.data;
+            root = root.left;
+        }
+        return minv;
+    }
+}
 ```
 
-2. **Inorder (Left → Root → Right)**
-```python
-def inorder_traversal(node):
-    if node:
-        inorder_traversal(node.left)
-        print(node.data)
-        inorder_traversal(node.right)
-```
+## Balanced Trees
 
-3. **Postorder (Left → Right → Root)**
-```python
-def postorder_traversal(node):
-    if node:
-        postorder_traversal(node.left)
-        postorder_traversal(node.right)
-        print(node.data)
-```
+### AVL Trees
 
-### Breadth-First Traversal
+AVL trees are self-balancing binary search trees where the heights of left and right subtrees differ by at most one.
 
-```python
-def level_order_traversal(root):
-    if not root:
-        return
-    
-    queue = [root]
-    while queue:
-        node = queue.pop(0)
-        print(node.data)
-        if node.left:
-            queue.append(node.left)
-        if node.right:
-            queue.append(node.right)
-```
+#### Balancing Operations
 
-## Common Tree Problems
+1. **Left Rotation**
+2. **Right Rotation**
+3. **Left-Right Rotation**
+4. **Right-Left Rotation**
 
-### Height of Tree
-```python
-def tree_height(node):
-    if not node:
-        return 0
-    return max(tree_height(node.left), tree_height(node.right)) + 1
-```
+### Red-Black Trees
 
-### Check if Balanced
-```python
-def is_balanced(node):
-    if not node:
-        return True, 0
-    
-    left_balanced, left_height = is_balanced(node.left)
-    right_balanced, right_height = is_balanced(node.right)
-    
-    height = max(left_height, right_height) + 1
-    balanced = left_balanced and right_balanced and abs(left_height - right_height) <= 1
-    
-    return balanced, height
-```
+Red-Black trees are self-balancing binary search trees with the following properties:
+1. Root is black
+2. All leaves are black
+3. If node is red, both children are black
+4. Every path from root to leaves contains same number of black nodes
 
-### Mirror Tree
-```python
-def mirror_tree(node):
-    if not node:
-        return
-    
-    node.left, node.right = node.right, node.left
-    mirror_tree(node.left)
-    mirror_tree(node.right)
+#### Java Implementation
+
+```java
+public class RedBlackTree<T extends Comparable<T>> {
+    private static final boolean RED = true;
+    private static final boolean BLACK = false;
+
+    private static class Node<T> {
+        T data;
+        Node<T> left, right, parent;
+        boolean color;
+
+        Node(T data) {
+            this.data = data;
+            this.color = RED;
+            this.left = null;
+            this.right = null;
+            this.parent = null;
+        }
+    }
+
+    private Node<T> root;
+
+    public RedBlackTree() {
+        root = null;
+    }
+
+    public void insert(T data) {
+        Node<T> node = new Node<>(data);
+        root = insertRec(root, node);
+        fixViolations(node);
+    }
+
+    private Node<T> insertRec(Node<T> root, Node<T> node) {
+        if (root == null) {
+            return node;
+        }
+
+        if (node.data.compareTo(root.data) < 0) {
+            root.left = insertRec(root.left, node);
+            root.left.parent = root;
+        } else if (node.data.compareTo(root.data) > 0) {
+            root.right = insertRec(root.right, node);
+            root.right.parent = root;
+        }
+
+        return root;
+    }
+
+    private void fixViolations(Node<T> node) {
+        Node<T> parent = null;
+        Node<T> grandParent = null;
+
+        while (node != root && node.color == RED && node.parent.color == RED) {
+            parent = node.parent;
+            grandParent = parent.parent;
+
+            if (parent == grandParent.left) {
+                Node<T> uncle = grandParent.right;
+
+                if (uncle != null && uncle.color == RED) {
+                    grandParent.color = RED;
+                    parent.color = BLACK;
+                    uncle.color = BLACK;
+                    node = grandParent;
+                } else {
+                    if (node == parent.right) {
+                        rotateLeft(parent);
+                        node = parent;
+                        parent = node.parent;
+                    }
+                    rotateRight(grandParent);
+                    boolean tempColor = parent.color;
+                    parent.color = grandParent.color;
+                    grandParent.color = tempColor;
+                    node = parent;
+                }
+            } else {
+                Node<T> uncle = grandParent.left;
+
+                if (uncle != null && uncle.color == RED) {
+                    grandParent.color = RED;
+                    parent.color = BLACK;
+                    uncle.color = BLACK;
+                    node = grandParent;
+                } else {
+                    if (node == parent.left) {
+                        rotateRight(parent);
+                        node = parent;
+                        parent = node.parent;
+                    }
+                    rotateLeft(grandParent);
+                    boolean tempColor = parent.color;
+                    parent.color = grandParent.color;
+                    grandParent.color = tempColor;
+                    node = parent;
+                }
+            }
+        }
+        root.color = BLACK;
+    }
+
+    private void rotateLeft(Node<T> node) {
+        Node<T> right = node.right;
+        node.right = right.left;
+        if (right.left != null) {
+            right.left.parent = node;
+        }
+        right.parent = node.parent;
+        if (node.parent == null) {
+            root = right;
+        } else if (node == node.parent.left) {
+            node.parent.left = right;
+        } else {
+            node.parent.right = right;
+        }
+        right.left = node;
+        node.parent = right;
+    }
+
+    private void rotateRight(Node<T> node) {
+        Node<T> left = node.left;
+        node.left = left.right;
+        if (left.right != null) {
+            left.right.parent = node;
+        }
+        left.parent = node.parent;
+        if (node.parent == null) {
+            root = left;
+        } else if (node == node.parent.right) {
+            node.parent.right = left;
+        } else {
+            node.parent.left = left;
+        }
+        left.right = node;
+        node.parent = left;
+    }
+}
 ```
 
 ## Real-World Applications
 
-### File System Structure
-- Directory hierarchy
+### File Systems
+
+- Directory structure
 - File organization
-- Path navigation
+- Hierarchical storage
 
-### Organization Charts
-- Company hierarchy
-- Department structure
-- Reporting relationships
+### Database Systems
 
-### XML/HTML Parsing
-- Document structure
-- Element hierarchy
-- DOM tree
+- Index structures
+- B-trees for storage
+- Query optimization
 
-### Decision Trees
-- Machine learning
-- Game AI
-- Expert systems
+### Compiler Design
 
-## Implementation Considerations
+- Abstract syntax trees
+- Expression trees
+- Parse trees
 
-### Memory Management
-1. Node allocation
-2. Garbage collection
-3. Memory leaks prevention
-4. Tree balancing
+### Network Routing
 
-### Performance Optimization
-1. Caching
-2. Lazy loading
-3. Tree balancing
-4. Traversal optimization
+- Decision trees
+- Routing tables
+- Network topology
+
+## Tree Traversal Algorithms
+
+### 1. Depth-First Traversal
+
+```java
+public void inorderTraversal() {
+    inorderRec(root);
+}
+
+private void inorderRec(Node<T> root) {
+    if (root != null) {
+        inorderRec(root.left);
+        System.out.print(root.data + " ");
+        inorderRec(root.right);
+    }
+}
+```
+
+### 2. Breadth-First Traversal
+
+```java
+public void levelOrderTraversal() {
+    if (root == null) {
+        return;
+    }
+
+    Queue<Node<T>> queue = new LinkedList<>();
+    queue.add(root);
+
+    while (!queue.isEmpty()) {
+        Node<T> node = queue.poll();
+        System.out.print(node.data + " ");
+
+        if (node.left != null) {
+            queue.add(node.left);
+        }
+        if (node.right != null) {
+            queue.add(node.right);
+        }
+    }
+}
+```
 
 ## Best Practices
 
-### Tree Design
-1. Choose appropriate tree type
-2. Consider balance requirements
-3. Plan for scalability
-4. Handle edge cases
+1. **Tree Design**
+   - Choose appropriate tree type
+   - Consider balancing requirements
+   - Plan for scalability
 
-### Implementation
-1. Use proper node structure
-2. Implement efficient traversals
-3. Handle null cases
-4. Consider thread safety
+2. **Implementation**
+   - Handle edge cases
+   - Maintain balance
+   - Optimize operations
 
-## Summary
+3. **Performance**
+   - Monitor height
+   - Balance when needed
+   - Cache frequently accessed nodes
 
-Key points to remember:
-1. Trees are hierarchical structures
-2. Binary trees have at most 2 children
-3. Different traversal methods exist
-4. Balance is important for performance
-5. Choose appropriate tree type
-6. Handle edge cases properly
+## Common Pitfalls
 
-By understanding trees and binary trees, you can:
-- Implement hierarchical data structures
-- Solve complex problems efficiently
-- Build scalable applications
-- Optimize data organization
-- Design efficient algorithms 
+1. **Balance Issues**
+   - Unbalanced trees
+   - Skewed trees
+   - Height imbalance
+
+2. **Memory Management**
+   - Memory leaks
+   - Proper cleanup
+   - Reference management
+
+3. **Concurrency**
+   - Race conditions
+   - Lock management
+   - Thread safety
+
+## Exercises
+
+1. Implement a binary search tree with all operations
+2. Create an AVL tree implementation
+3. Design a Red-Black tree with insertion and deletion
+4. Write a function to check if a tree is balanced
+5. Implement level-order traversal using queues
+
+## Additional Resources
+
+- [GeeksforGeeks - Binary Tree](https://www.geeksforgeeks.org/binary-tree-data-structure/)
+- [GeeksforGeeks - Binary Search Tree](https://www.geeksforgeeks.org/binary-search-tree-data-structure/)
+- [Visualgo - Binary Search Tree](https://visualgo.net/en/bst)
+- [Red-Black Tree Visualization](https://www.cs.usfca.edu/~galles/visualization/RedBlack.html) 

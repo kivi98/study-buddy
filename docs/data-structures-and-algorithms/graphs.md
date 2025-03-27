@@ -1,316 +1,499 @@
 # Graphs
 
-[Back to Course Content](README.md) | [← Previous: Advanced Trees](advanced-trees.md) | [Next: Sorting Algorithms →](sorting.md)
+[Back to Course Content](README.md) | [Previous: Trees](trees.md) | [Next: Sorting Algorithms →](sorting.md)
 
-## Introduction to Graphs
+> Reference: This content is based on Graphs.pdf and Graph-algorithms.pdf
 
-A graph is a non-linear data structure consisting of vertices (nodes) and edges that connect these vertices.
+## What are Graphs?
 
-### Graph Characteristics
+Graphs are non-linear data structures that represent relationships between objects. They consist of vertices (nodes) connected by edges, which can be directed or undirected.
 
 ```mermaid
-graph TD
-    A[Graph] --> B[Directed/Undirected]
-    A --> C[Weighted/Unweighted]
-    A --> D[Cyclic/Acyclic]
-    B --> E[Directed Edges]
-    B --> F[Undirected Edges]
-    C --> G[Edge Weights]
-    C --> H[No Weights]
-    D --> I[Contains Cycles]
-    D --> J[No Cycles]
+mindmap
+    root((Graphs))
+        Types
+            Directed
+            Undirected
+            Weighted
+            Unweighted
+        Representations
+            Adjacency Matrix
+            Adjacency List
+            Edge List
+        Algorithms
+            Traversal
+            Shortest Path
+            Minimum Spanning Tree
 ```
+
+## Basic Graph Concepts
 
 ### Graph Terminology
 
-| Term | Description |
-|------|-------------|
-| Vertex/Node | Point in graph |
-| Edge | Connection between vertices |
-| Degree | Number of edges connected to vertex |
-| Path | Sequence of vertices connected by edges |
-| Cycle | Path that starts and ends at same vertex |
-| Connected | Path exists between all vertices |
-| Weighted | Edges have associated values |
-| Directed | Edges have direction |
-| Undirected | Edges have no direction |
+- **Vertex/Node**: Point in the graph
+- **Edge**: Connection between vertices
+- **Degree**: Number of edges connected to a vertex
+- **Path**: Sequence of vertices connected by edges
+- **Cycle**: Path that starts and ends at same vertex
+- **Connected**: Path exists between any two vertices
+- **Weight**: Value associated with an edge
+
+### Graph Properties
+
+1. **Directed vs Undirected**
+   - Directed: Edges have direction
+   - Undirected: Edges have no direction
+
+2. **Weighted vs Unweighted**
+   - Weighted: Edges have weights
+   - Unweighted: All edges have same weight
+
+3. **Cyclic vs Acyclic**
+   - Cyclic: Contains cycles
+   - Acyclic: No cycles
 
 ## Graph Representations
 
 ### 1. Adjacency Matrix
 
-```python
-class GraphMatrix:
-    def __init__(self, vertices):
-        self.V = vertices
-        self.graph = [[0] * vertices for _ in range(vertices)]
-    
-    def add_edge(self, u, v, weight=1):
-        self.graph[u][v] = weight
-        # For undirected graph
-        self.graph[v][u] = weight
-    
-    def remove_edge(self, u, v):
-        self.graph[u][v] = 0
-        # For undirected graph
-        self.graph[v][u] = 0
+A 2D array where matrix[i][j] indicates if there's an edge between vertex i and j.
+
+```java
+public class GraphMatrix {
+    private int[][] matrix;
+    private int vertices;
+
+    public GraphMatrix(int vertices) {
+        this.vertices = vertices;
+        matrix = new int[vertices][vertices];
+    }
+
+    public void addEdge(int source, int destination) {
+        matrix[source][destination] = 1;
+        // For undirected graph
+        matrix[destination][source] = 1;
+    }
+
+    public void addWeightedEdge(int source, int destination, int weight) {
+        matrix[source][destination] = weight;
+        // For undirected graph
+        matrix[destination][source] = weight;
+    }
+
+    public boolean hasEdge(int source, int destination) {
+        return matrix[source][destination] != 0;
+    }
+
+    public int getWeight(int source, int destination) {
+        return matrix[source][destination];
+    }
+}
 ```
 
 ### 2. Adjacency List
 
-```python
-class GraphList:
-    def __init__(self, vertices):
-        self.V = vertices
-        self.graph = [[] for _ in range(vertices)]
-    
-    def add_edge(self, u, v, weight=1):
-        self.graph[u].append((v, weight))
-        # For undirected graph
-        self.graph[v].append((u, weight))
-    
-    def remove_edge(self, u, v):
-        self.graph[u] = [(x, w) for x, w in self.graph[u] if x != v]
-        # For undirected graph
-        self.graph[v] = [(x, w) for x, w in self.graph[v] if x != u]
+An array of lists where each list contains vertices adjacent to that vertex.
+
+```java
+public class GraphList {
+    private ArrayList<ArrayList<Integer>> adjList;
+    private int vertices;
+
+    public GraphList(int vertices) {
+        this.vertices = vertices;
+        adjList = new ArrayList<>();
+        for (int i = 0; i < vertices; i++) {
+            adjList.add(new ArrayList<>());
+        }
+    }
+
+    public void addEdge(int source, int destination) {
+        adjList.get(source).add(destination);
+        // For undirected graph
+        adjList.get(destination).add(source);
+    }
+
+    public boolean hasEdge(int source, int destination) {
+        return adjList.get(source).contains(destination);
+    }
+
+    public ArrayList<Integer> getNeighbors(int vertex) {
+        return adjList.get(vertex);
+    }
+}
+```
+
+### 3. Edge List
+
+A list of all edges in the graph.
+
+```java
+public class Edge {
+    int source;
+    int destination;
+    int weight;
+
+    Edge(int source, int destination, int weight) {
+        this.source = source;
+        this.destination = destination;
+        this.weight = weight;
+    }
+}
+
+public class GraphEdgeList {
+    private ArrayList<Edge> edges;
+    private int vertices;
+
+    public GraphEdgeList(int vertices) {
+        this.vertices = vertices;
+        edges = new ArrayList<>();
+    }
+
+    public void addEdge(int source, int destination, int weight) {
+        edges.add(new Edge(source, destination, weight));
+        // For undirected graph
+        edges.add(new Edge(destination, source, weight));
+    }
+
+    public ArrayList<Edge> getEdges() {
+        return edges;
+    }
+}
 ```
 
 ## Graph Traversal Algorithms
 
 ### 1. Depth-First Search (DFS)
 
-```python
-def dfs(graph, start, visited=None):
-    if visited is None:
-        visited = set()
-    
-    visited.add(start)
-    print(start, end=' ')
-    
-    for neighbor in graph[start]:
-        if neighbor not in visited:
-            dfs(graph, neighbor, visited)
+```java
+public class GraphDFS {
+    private boolean[] visited;
 
-# Iterative DFS
-def dfs_iterative(graph, start):
-    visited = set()
-    stack = [start]
-    
-    while stack:
-        vertex = stack.pop()
-        if vertex not in visited:
-            visited.add(vertex)
-            print(vertex, end=' ')
-            stack.extend(reversed(graph[vertex]))
+    public void dfs(GraphList graph, int start) {
+        visited = new boolean[graph.getVertices()];
+        dfsUtil(graph, start);
+    }
+
+    private void dfsUtil(GraphList graph, int vertex) {
+        visited[vertex] = true;
+        System.out.print(vertex + " ");
+
+        for (int neighbor : graph.getNeighbors(vertex)) {
+            if (!visited[neighbor]) {
+                dfsUtil(graph, neighbor);
+            }
+        }
+    }
+}
 ```
 
 ### 2. Breadth-First Search (BFS)
 
-```python
-from collections import deque
+```java
+public class GraphBFS {
+    private boolean[] visited;
 
-def bfs(graph, start):
-    visited = set()
-    queue = deque([start])
-    visited.add(start)
-    
-    while queue:
-        vertex = queue.popleft()
-        print(vertex, end=' ')
+    public void bfs(GraphList graph, int start) {
+        visited = new boolean[graph.getVertices()];
+        Queue<Integer> queue = new LinkedList<>();
         
-        for neighbor in graph[vertex]:
-            if neighbor not in visited:
-                visited.add(neighbor)
-                queue.append(neighbor)
+        visited[start] = true;
+        queue.add(start);
+
+        while (!queue.isEmpty()) {
+            int vertex = queue.poll();
+            System.out.print(vertex + " ");
+
+            for (int neighbor : graph.getNeighbors(vertex)) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    queue.add(neighbor);
+                }
+            }
+        }
+    }
+}
 ```
 
 ## Shortest Path Algorithms
 
 ### 1. Dijkstra's Algorithm
 
-```python
-import heapq
+```java
+public class Dijkstra {
+    private static final int INF = Integer.MAX_VALUE;
 
-def dijkstra(graph, start):
-    distances = {vertex: float('infinity') for vertex in graph}
-    distances[start] = 0
-    pq = [(0, start)]
-    
-    while pq:
-        current_distance, current_vertex = heapq.heappop(pq)
-        
-        if current_distance > distances[current_vertex]:
-            continue
-        
-        for neighbor, weight in graph[current_vertex]:
-            distance = current_distance + weight
-            
-            if distance < distances[neighbor]:
-                distances[neighbor] = distance
-                heapq.heappush(pq, (distance, neighbor))
-    
-    return distances
+    public int[] dijkstra(GraphMatrix graph, int source) {
+        int vertices = graph.getVertices();
+        int[] dist = new int[vertices];
+        boolean[] visited = new boolean[vertices];
+
+        Arrays.fill(dist, INF);
+        dist[source] = 0;
+
+        for (int i = 0; i < vertices - 1; i++) {
+            int u = minDistance(dist, visited);
+            visited[u] = true;
+
+            for (int v = 0; v < vertices; v++) {
+                if (!visited[v] && graph.hasEdge(u, v) && 
+                    dist[u] != INF && 
+                    dist[u] + graph.getWeight(u, v) < dist[v]) {
+                    dist[v] = dist[u] + graph.getWeight(u, v);
+                }
+            }
+        }
+
+        return dist;
+    }
+
+    private int minDistance(int[] dist, boolean[] visited) {
+        int min = INF;
+        int minIndex = -1;
+
+        for (int v = 0; v < dist.length; v++) {
+            if (!visited[v] && dist[v] <= min) {
+                min = dist[v];
+                minIndex = v;
+            }
+        }
+
+        return minIndex;
+    }
+}
 ```
 
 ### 2. Floyd-Warshall Algorithm
 
-```python
-def floyd_warshall(graph):
-    V = len(graph)
-    dist = [[float('infinity')] * V for _ in range(V)]
-    
-    # Initialize distances
-    for i in range(V):
-        for j in range(V):
-            if i == j:
-                dist[i][j] = 0
-            elif graph[i][j] != 0:
-                dist[i][j] = graph[i][j]
-    
-    # Floyd-Warshall algorithm
-    for k in range(V):
-        for i in range(V):
-            for j in range(V):
-                if dist[i][k] + dist[k][j] < dist[i][j]:
-                    dist[i][j] = dist[i][k] + dist[k][j]
-    
-    return dist
+```java
+public class FloydWarshall {
+    public int[][] floydWarshall(GraphMatrix graph) {
+        int vertices = graph.getVertices();
+        int[][] dist = new int[vertices][vertices];
+
+        // Initialize distance matrix
+        for (int i = 0; i < vertices; i++) {
+            for (int j = 0; j < vertices; j++) {
+                if (i == j) {
+                    dist[i][j] = 0;
+                } else if (graph.hasEdge(i, j)) {
+                    dist[i][j] = graph.getWeight(i, j);
+                } else {
+                    dist[i][j] = Integer.MAX_VALUE;
+                }
+            }
+        }
+
+        // Floyd-Warshall algorithm
+        for (int k = 0; k < vertices; k++) {
+            for (int i = 0; i < vertices; i++) {
+                for (int j = 0; j < vertices; j++) {
+                    if (dist[i][k] != Integer.MAX_VALUE && 
+                        dist[k][j] != Integer.MAX_VALUE && 
+                        dist[i][k] + dist[k][j] < dist[i][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                    }
+                }
+            }
+        }
+
+        return dist;
+    }
+}
 ```
 
 ## Minimum Spanning Tree Algorithms
 
 ### 1. Kruskal's Algorithm
 
-```python
-class DisjointSet:
-    def __init__(self, vertices):
-        self.parent = {v: v for v in vertices}
-        self.rank = {v: 0 for v in vertices}
-    
-    def find(self, item):
-        if self.parent[item] != item:
-            self.parent[item] = self.find(self.parent[item])
-        return self.parent[item]
-    
-    def union(self, x, y):
-        root_x = self.find(x)
-        root_y = self.find(y)
-        
-        if root_x != root_y:
-            if self.rank[root_x] < self.rank[root_y]:
-                self.parent[root_x] = root_y
-            elif self.rank[root_x] > self.rank[root_y]:
-                self.parent[root_y] = root_x
-            else:
-                self.parent[root_y] = root_x
-                self.rank[root_x] += 1
+```java
+public class Kruskal {
+    private static class Edge implements Comparable<Edge> {
+        int source, destination, weight;
 
-def kruskal(graph):
-    edges = []
-    for u in graph:
-        for v, weight in graph[u]:
-            edges.append((weight, u, v))
-    
-    edges.sort()
-    ds = DisjointSet(graph.keys())
-    mst = []
-    
-    for weight, u, v in edges:
-        if ds.find(u) != ds.find(v):
-            ds.union(u, v)
-            mst.append((u, v, weight))
-    
-    return mst
+        Edge(int source, int destination, int weight) {
+            this.source = source;
+            this.destination = destination;
+            this.weight = weight;
+        }
+
+        @Override
+        public int compareTo(Edge other) {
+            return this.weight - other.weight;
+        }
+    }
+
+    private int find(int[] parent, int i) {
+        if (parent[i] == i) {
+            return i;
+        }
+        return find(parent, parent[i]);
+    }
+
+    private void union(int[] parent, int[] rank, int x, int y) {
+        int xRoot = find(parent, x);
+        int yRoot = find(parent, y);
+
+        if (rank[xRoot] < rank[yRoot]) {
+            parent[xRoot] = yRoot;
+        } else if (rank[xRoot] > rank[yRoot]) {
+            parent[yRoot] = xRoot;
+        } else {
+            parent[yRoot] = xRoot;
+            rank[xRoot]++;
+        }
+    }
+
+    public ArrayList<Edge> kruskalMST(GraphEdgeList graph) {
+        ArrayList<Edge> result = new ArrayList<>();
+        ArrayList<Edge> edges = graph.getEdges();
+        Collections.sort(edges);
+
+        int[] parent = new int[graph.getVertices()];
+        int[] rank = new int[graph.getVertices()];
+
+        for (int i = 0; i < graph.getVertices(); i++) {
+            parent[i] = i;
+        }
+
+        for (Edge edge : edges) {
+            int x = find(parent, edge.source);
+            int y = find(parent, edge.destination);
+
+            if (x != y) {
+                result.add(edge);
+                union(parent, rank, x, y);
+            }
+        }
+
+        return result;
+    }
+}
 ```
 
 ### 2. Prim's Algorithm
 
-```python
-def prim(graph, start):
-    mst = []
-    visited = {start}
-    edges = [(weight, start, v) for v, weight in graph[start]]
-    heapq.heapify(edges)
-    
-    while edges:
-        weight, u, v = heapq.heappop(edges)
-        if v not in visited:
-            visited.add(v)
-            mst.append((u, v, weight))
-            for neighbor, weight in graph[v]:
-                if neighbor not in visited:
-                    heapq.heappush(edges, (weight, v, neighbor))
-    
-    return mst
+```java
+public class Prim {
+    public ArrayList<Edge> primMST(GraphMatrix graph) {
+        int vertices = graph.getVertices();
+        ArrayList<Edge> result = new ArrayList<>();
+        boolean[] visited = new boolean[vertices];
+        int[] key = new int[vertices];
+        int[] parent = new int[vertices];
+
+        Arrays.fill(key, Integer.MAX_VALUE);
+        Arrays.fill(visited, false);
+        key[0] = 0;
+        parent[0] = -1;
+
+        for (int i = 0; i < vertices - 1; i++) {
+            int u = minKey(key, visited);
+            visited[u] = true;
+
+            for (int v = 0; v < vertices; v++) {
+                if (graph.hasEdge(u, v) && !visited[v] && 
+                    graph.getWeight(u, v) < key[v]) {
+                    parent[v] = u;
+                    key[v] = graph.getWeight(u, v);
+                }
+            }
+        }
+
+        for (int i = 1; i < vertices; i++) {
+            result.add(new Edge(parent[i], i, key[i]));
+        }
+
+        return result;
+    }
+
+    private int minKey(int[] key, boolean[] visited) {
+        int min = Integer.MAX_VALUE;
+        int minIndex = -1;
+
+        for (int v = 0; v < key.length; v++) {
+            if (!visited[v] && key[v] < min) {
+                min = key[v];
+                minIndex = v;
+            }
+        }
+
+        return minIndex;
+    }
+}
 ```
 
-## Graph Applications
+## Real-World Applications
 
-### 1. Social Networks
+### Network Routing
+
+- Internet routing
+- Network topology
+- Traffic optimization
+
+### Social Networks
+
 - Friend connections
-- Follow relationships
-- Network analysis
+- Influence analysis
 - Community detection
 
-### 2. Transportation Networks
-- Road maps
-- Flight routes
-- Navigation systems
+### Transportation
+
+- Route planning
 - Traffic flow
+- Delivery optimization
 
-### 3. Computer Networks
-- Network topology
-- Routing protocols
-- Network flow
-- Connection optimization
+### Game Development
 
-### 4. Game Development
 - Path finding
 - AI navigation
-- Game state transitions
 - Level design
-
-## Implementation Considerations
-
-### Memory Management
-1. Sparse vs dense graphs
-2. Memory-efficient representations
-3. Dynamic graph updates
-4. Cache optimization
-
-### Performance Optimization
-1. Algorithm selection
-2. Data structure choice
-3. Parallel processing
-4. Caching strategies
 
 ## Best Practices
 
-### Graph Design
-1. Choose appropriate representation
-2. Consider graph properties
-3. Plan for scalability
-4. Handle edge cases
+1. **Graph Design**
+   - Choose appropriate representation
+   - Consider memory constraints
+   - Plan for scalability
 
-### Implementation
-1. Use efficient data structures
-2. Optimize algorithms
-3. Handle memory constraints
-4. Consider concurrency
+2. **Implementation**
+   - Handle edge cases
+   - Optimize for specific use cases
+   - Consider parallel processing
 
-## Summary
+3. **Performance**
+   - Use appropriate data structures
+   - Optimize algorithms
+   - Cache frequently accessed data
 
-Key points to remember:
-1. Graphs model relationships
-2. Different representations exist
-3. Various traversal methods
-4. Multiple path-finding algorithms
-5. MST algorithms for optimization
-6. Consider application needs
+## Common Pitfalls
 
-By understanding graphs, you can:
-- Model complex relationships
-- Solve path-finding problems
-- Optimize network flows
-- Design efficient algorithms
-- Build scalable systems 
+1. **Memory Management**
+   - Memory leaks
+   - Large adjacency matrices
+   - Inefficient representations
+
+2. **Algorithm Selection**
+   - Wrong algorithm for use case
+   - Inefficient implementations
+   - Poor scalability
+
+3. **Edge Cases**
+   - Cycles
+   - Disconnected graphs
+   - Negative weights
+
+## Exercises
+
+1. Implement DFS and BFS for a graph
+2. Create Dijkstra's algorithm for shortest paths
+3. Design Kruskal's algorithm for MST
+4. Write a function to detect cycles in a graph
+5. Implement topological sorting for DAGs
+
+## Additional Resources
+
+- [GeeksforGeeks - Graph Data Structure](https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/)
+- [Visualgo - Graph Traversal](https://visualgo.net/en/dfsbfs)
+- [Graph Theory Algorithms](https://www.youtube.com/playlist?list=PLDV1Zeh2NRsDGO4--qE8yH72HFL1Km93P)
+- [NetworkX Documentation](https://networkx.org/documentation/stable/) 
