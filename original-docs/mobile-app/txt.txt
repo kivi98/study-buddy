@@ -1,0 +1,146 @@
+
+1
+Mobile ComputingAnatomy
+Architecture of a Mobile Device
+Kernel
+Hardware Abstraction Layer
+Libraries
+Runtime
+Core Libraries
+Virtual Machines
+Application Framework
+Applications
+Android Mobile Devices
+Display Driver Camera Drivers Bluetooth Drivers Shared Memory 
+Drivers Binder (IPC) Driver
+USB Driver Keypad Driver Wi-Fi Driver Audio Driver Power 
+Management
+LINUX KERNEL
+HARDWARE ABSTRACTION LAYER
+Graphics Audio Camera Bluetooth GPS Radio (RIL) Wi-Fi ...
+Surface 
+Manager
+Media 
+Framework SQLlite Webkit Libc
+SSLFree TypeAudio 
+ManagerOpenGL/ES ....
+LIBRARIES
+APPLICATION FRAMEWORK
+ANDROID RUNTIME
+Core Library
+Dalvik VM
+Activity Manager
+Package Manager
+Windows Manager Content Provider View System Notification Manager
+Location ManagerResource ManagerTelephony Manager ...
+APPLICATIONS
+Home Dialer SMS/MMS IM Browser Camera Alarm Calculator
+Contacts Voice Dial Email Calendar Media Player Photo Album Clock ...
+Linux Kernel in Android
+•Uses Linux 2.6 kernel
+–No native windowing system
+–No glibc library support
+•Provides basic system functionalities
+–Process management
+–Memory management
+–Device management 
+•Camera
+•Keypad
+•Display etc. 
+•The kernel handles 
+–Networking
+–Vast array of device drivers
+Hardware Abstraction Layer
+•Hardware abstraction layer has the characteristics:
+–The user space C/C++ base layer.
+–Defines an interface between hardware drivers and android library.
+–Separation of Android platform and hardware interface logic.
+•Why do you need a user space in Android HAL? 
+–Not all components with standard kernel driver interface
+–Kernel driver is the GPL, which will be exposed to all intellectual property rights
+–Android has specific requirements for the hardware driver.
+Libraries•The local library includes:
+–Bionic Libc
+•Custom libc implementation, optimized for embedded.
+–Function Libraries
+–Native Servers
+–Hardware Abstraction Libraries
+•Bionic libc:
+–The BSD license
+–The code path is small and fast
+–Very fast and small custom pthread implementation
+–Built in support for a specific Android service important system properties
+–Does not support some POSIX features.
+–GNU Libc (glibc) is not compatible.
+–The Native code must rely on the bionic to compile.
+Libraries•Function Libraries
+–WebKit
+•Based on the open source WebKit browser:
+•In full view rendering
+•Fully support CSS, Javascript, DOM, AJAX
+•Support single and adaptive rendering
+–Media Framework
+•OpenCORE platform on PacketVideo
+•Support the standard video, audio, still-frame format
+•Support hardware / software encoder plug-in
+–SQLite
+•A lightweight transaction data storage
+•The back-end data store of most platform
+Libraries•Native Servers
+–Surface Flinger
+•Provides system wide appearance "combiner", all the 
+appearance of rendering into the frame in buffer 
+equipment.
+•Can be combined with 2D and 3D appearance and 
+multiple application appearance.
+•Can use the OpenGL ES and the 2D hardware 
+accelerator
+•Double buffer system using page-flip.
+–Audio Flinger
+•The output of the audio equipment management
+•Processing of multiple audio flows to the PCM audio 
+output path.
+•Audio routing to each output.
+Core Library & VMs
+•The core library(Core Libraries)
+–Java Core APIs provides a powerful, but simple and familiar development platform.Data structure
+–Tool and Utilities
+–File Access
+–Network Access
+–Graphics
+•Dalvik VM
+–A special Java virtual machine (VM) designed to run with limited system resource
+–Memory efficient
+–Register machine vs. Stack machine (modern JVM)
+•fewer instructions, faster execution
+–Running multiple VMs more efficiently
+–DEX: Dalvik Executables
+–Java class files are converted into “.dex” files that Dalvik executes
+•Java byte-code is converted into Dalvik byte-code during this process
+Application Framework•Application Services
+–Activity Manager
+•Manages the lifecycle of applications. 
+–Package Manager
+•Maintains information on the available applications on the device. 
+–Window Manager
+•Performs window management.
+–Resource Manager
+•Manages the storing of strings and layout files and bitmaps. 
+–Content Provider
+•Allows one application to make its data available to another
+–View System
+•Contains the building blocks of the user interface – buttons, text boxes etc.
+–Notification Manager
+•Alerts the user about events: Status bar updates, flashing lights, vibrations etc.
+•Hardware Services–Telephony Service
+•API’s needed to build the phone application and SMS.
+–Location Service
+• Uses GPS and Android Network provider which uses cell tower and wi-fi signals. 
+–Bluetooth Service
+•Access Bluetooth
+–WIFI Service
+•Access Wi-Fi
+–USB Service
+•Access USB for various tasks
+–Sensor Service
+•Access sensors

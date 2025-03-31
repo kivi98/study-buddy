@@ -32,306 +32,350 @@ mindmap
 
 ### 1. Base Case and Recursive Case
 
+#### What is it?
+The base case and recursive case are the two fundamental components of a recursive function:
+
+1. **Base Case**: The simplest instance of the problem that can be solved directly without recursion
+2. **Recursive Case**: The part where the function calls itself with a smaller or simpler input
+
+#### Mathematical Representation
+For a recursive function T(n):
+```
+T(n) = {
+    c,                    if n ≤ n₀ (base case)
+    a·T(n/b) + f(n),     if n > n₀ (recursive case)
+}
+```
+where:
+- c is the constant time for base case
+- n₀ is the threshold for base case
+- a is the number of recursive calls
+- b is the factor by which input is reduced
+- f(n) is the work done outside recursive calls
+
+#### Real-world Applications
+1. **File System Navigation**
+   - Base case: Reaching a file (no more directories)
+   - Recursive case: Exploring subdirectories
+
+2. **Document Processing**
+   - Base case: Processing a leaf node
+   - Recursive case: Processing child nodes
+
+3. **Mathematical Calculations**
+   - Base case: Simple arithmetic operations
+   - Recursive case: Complex calculations broken down
+
+#### Examples with Analysis
+
 ```java
-public class BasicRecursion {
-    // Example: Factorial
+public class RecursionExamples {
+    // Example 1: Factorial
     public int factorial(int n) {
-        // Base case
+        // Base case: n ≤ 1
         if (n <= 1) {
             return 1;
         }
-        // Recursive case
+        // Recursive case: n! = n * (n-1)!
         return n * factorial(n - 1);
     }
 
-    // Example: Sum of digits
-    public int sumDigits(int n) {
-        // Base case
-        if (n < 10) {
-            return n;
+    // Example 2: Binary Search
+    public int binarySearch(int[] arr, int target, int left, int right) {
+        // Base case: empty or single element
+        if (left > right) {
+            return -1;
         }
-        // Recursive case
-        return n % 10 + sumDigits(n / 10);
+        
+        int mid = left + (right - left) / 2;
+        
+        // Base case: found target
+        if (arr[mid] == target) {
+            return mid;
+        }
+        
+        // Recursive case: search in appropriate half
+        if (arr[mid] < target) {
+            return binarySearch(arr, target, mid + 1, right);
+        }
+        return binarySearch(arr, target, left, mid - 1);
+    }
+    
+    // Example 3: Directory Size Calculation
+    public long calculateDirectorySize(File dir) {
+        // Base case: not a directory
+        if (!dir.isDirectory()) {
+            return dir.length();
+        }
+        
+        long size = 0;
+        File[] files = dir.listFiles();
+        
+        // Recursive case: sum sizes of all contents
+        for (File file : files) {
+            size += calculateDirectorySize(file);
+        }
+        
+        return size;
     }
 }
 ```
 
+#### Visualization of Base and Recursive Cases
+
+```mermaid
+graph TD
+    A[Start: factorial(4)] --> B{Is n ≤ 1?}
+    B -->|No| C[Recursive Case: 4 * factorial(3)]
+    C --> D{Is n ≤ 1?}
+    D -->|No| E[Recursive Case: 3 * factorial(2)]
+    E --> F{Is n ≤ 1?}
+    F -->|No| G[Recursive Case: 2 * factorial(1)]
+    G --> H{Is n ≤ 1?}
+    H -->|Yes| I[Base Case: return 1]
+    I --> J[return 2]
+    J --> K[return 6]
+    K --> L[return 24]
+```
+
 ### 2. Call Stack
 
+#### What is it?
+The call stack is a data structure that keeps track of function calls in a program. For recursion, it maintains the state of each recursive call until it reaches the base case.
+
+#### Components of a Stack Frame
+1. **Parameters**: Function arguments
+2. **Local Variables**: Variables declared within the function
+3. **Return Address**: Where to return after function completion
+4. **Return Value**: The value to be returned (if any)
+
+#### Memory Analysis
+For a recursive function with depth n:
+- **Space Complexity**: O(n) for the call stack
+- **Memory per frame**: Constant size
+- **Total memory**: O(n) * (frame size)
+
+#### Real-world Applications
+1. **Debugging**: Stack traces show call hierarchy
+2. **Exception Handling**: Stack unwinding for error recovery
+3. **Program Flow**: Managing nested function calls
+
+#### Examples with Stack Visualization
+
 ```java
-public class CallStackExample {
+public class CallStackExamples {
+    // Example 1: Print numbers with stack visualization
     public void printNumbers(int n) {
         // Base case
         if (n <= 0) {
             return;
         }
+        
         // Print before recursive call (ascending)
-        System.out.println(n);
+        System.out.println("Pushing: " + n);
         printNumbers(n - 1);
         // Print after recursive call (descending)
-        System.out.println(n);
+        System.out.println("Popping: " + n);
+    }
+    
+    // Example 2: Tower of Hanoi with stack tracking
+    public void towerOfHanoi(int n, char source, char auxiliary, char target) {
+        // Base case
+        if (n == 1) {
+            System.out.println("Move disk 1 from " + source + " to " + target);
+            return;
+        }
+        
+        // Recursive case with stack tracking
+        System.out.println("Push: Move " + n + " disks from " + source + " to " + target);
+        towerOfHanoi(n - 1, source, target, auxiliary);
+        System.out.println("Pop: Move disk " + n + " from " + source + " to " + target);
+        towerOfHanoi(n - 1, auxiliary, source, target);
     }
 }
+```
+
+#### Call Stack Visualization
+
+```mermaid
+graph TD
+    subgraph "Call Stack for printNumbers(3)"
+        A["Frame 1: n=3
+        Return: main
+        Local: none"] --> B["Frame 2: n=2
+        Return: printNumbers(3)
+        Local: none"]
+        B --> C["Frame 3: n=1
+        Return: printNumbers(2)
+        Local: none"]
+        C --> D["Frame 4: n=0
+        Return: printNumbers(1)
+        Local: none"]
+        D --> E["Return void"]
+        E --> F["Print: 1"]
+        F --> G["Print: 2"]
+        G --> H["Print: 3"]
+    end
 ```
 
 ## Types of Recursion
 
 ### 1. Direct Recursion
 
+#### What is it?
+A function that calls itself directly within its body.
+
+#### Characteristics
+- Single recursive call
+- Clear call hierarchy
+- Linear stack growth
+
+#### Real-world Applications
+1. **Factorial Calculation**
+2. **String Reversal**
+3. **Array Summation**
+
+#### Example with Analysis
+
 ```java
 public class DirectRecursion {
-    // Function calls itself directly
-    public int fibonacci(int n) {
-        if (n <= 1) return n;
-        return fibonacci(n - 1) + fibonacci(n - 2);
+    // Example: String reversal
+    public String reverse(String str) {
+        // Base case
+        if (str.isEmpty() || str.length() == 1) {
+            return str;
+        }
+        // Direct recursive call
+        return str.charAt(str.length() - 1) + 
+               reverse(str.substring(0, str.length() - 1));
     }
+    
+    // Time Complexity: O(n²) due to string concatenation
+    // Space Complexity: O(n) for call stack
 }
 ```
 
 ### 2. Indirect Recursion
 
+#### What is it?
+A function that calls another function, which eventually calls the first function back.
+
+#### Characteristics
+- Multiple function calls
+- Circular dependency
+- Complex call hierarchy
+
+#### Real-world Applications
+1. **Parser Implementation**
+2. **State Machines**
+3. **Compiler Design**
+
+#### Example with Analysis
+
 ```java
 public class IndirectRecursion {
     public void functionA(int n) {
+        // Base case
         if (n <= 0) return;
+        
         System.out.println("A: " + n);
+        // Indirect recursive call through functionB
         functionB(n - 1);
     }
-
+    
     public void functionB(int n) {
+        // Base case
         if (n <= 0) return;
+        
         System.out.println("B: " + n);
+        // Indirect recursive call back to functionA
         functionA(n - 1);
     }
+    
+    // Time Complexity: O(n)
+    // Space Complexity: O(n)
 }
 ```
 
 ### 3. Tail Recursion
 
+#### What is it?
+A recursive function where the recursive call is the last operation in the function.
+
+#### Characteristics
+- No pending operations after recursive call
+- Can be optimized by compiler
+- No stack growth (in optimized form)
+
+#### Real-world Applications
+1. **Accumulator-based calculations**
+2. **Loop transformations**
+3. **Iterative algorithms**
+
+#### Example with Analysis
+
 ```java
 public class TailRecursion {
-    // Tail recursive factorial
+    // Example: Tail recursive factorial
     public int factorialTail(int n, int accumulator) {
-        if (n <= 1) return accumulator;
+        // Base case
+        if (n <= 1) {
+            return accumulator;
+        }
+        // Tail recursive call
         return factorialTail(n - 1, n * accumulator);
     }
-
-    // Tail recursive fibonacci
-    public int fibonacciTail(int n, int a, int b) {
-        if (n == 0) return a;
-        if (n == 1) return b;
-        return fibonacciTail(n - 1, b, a + b);
-    }
+    
+    // Time Complexity: O(n)
+    // Space Complexity: O(1) with tail call optimization
 }
 ```
 
 ### 4. Non-tail Recursion
 
+#### What is it?
+A recursive function where there are operations after the recursive call.
+
+#### Characteristics
+- Pending operations after recursive call
+- Stack growth with recursion depth
+- More complex to optimize
+
+#### Real-world Applications
+1. **Tree traversals**
+2. **Backtracking algorithms**
+3. **Divide and conquer**
+
+#### Example with Analysis
+
 ```java
 public class NonTailRecursion {
-    // Non-tail recursive factorial
+    // Example: Non-tail recursive factorial
     public int factorial(int n) {
-        if (n <= 1) return 1;
+        // Base case
+        if (n <= 1) {
+            return 1;
+        }
+        // Non-tail recursive call
         return n * factorial(n - 1);
     }
-
-    // Non-tail recursive fibonacci
-    public int fibonacci(int n) {
-        if (n <= 1) return n;
-        return fibonacci(n - 1) + fibonacci(n - 2);
-    }
+    
+    // Time Complexity: O(n)
+    // Space Complexity: O(n) for call stack
 }
 ```
 
-### 5. Linear vs Multiple Recursion
+#### Comparison Table
 
-Recursive functions can also be classified based on the number of recursive calls they make in each execution.
-
-#### Linear Recursion
-
-In linear recursion, a function makes at most one recursive call during its execution. The recursion follows a single path, which makes linear recursion simpler to analyze and often more efficient than multiple recursion.
-
-```java
-public class LinearRecursion {
-    // Linear recursion - factorial
-    public int factorial(int n) {
-        if (n <= 1) return 1;
-        return n * factorial(n - 1);  // Single recursive call
-    }
-    
-    // Linear recursion - exponentiation
-    public double power(double x, int n) {
-        if (n == 0) return 1;
-        if (n < 0) return 1 / power(x, -n);
-        if (n % 2 == 0) {
-            double half = power(x, n/2);
-            return half * half;
-        }
-        return x * power(x, n - 1);  // Single recursive call
-    }
-    
-    // Linear recursion - string reversal
-    public String reverse(String str) {
-        if (str.isEmpty() || str.length() == 1) {
-            return str;
-        }
-        return str.charAt(str.length() - 1) + 
-               reverse(str.substring(0, str.length() - 1));  // Single recursive call
-    }
-}
-```
-
-##### Mathematical Analysis
-
-For linear recursion:
-- **Time Complexity**: Typically O(n) where n is the input size or recursion depth
-- **Space Complexity**: O(n) for the call stack
-- **Recurrence Relation**: Often in the form T(n) = T(n-1) + O(1)
-
-Linear recursion is generally more efficient than multiple recursion because it creates only one new subproblem at each step. The total number of function calls is directly proportional to the input size.
-
-#### Multiple Recursion
-
-In multiple recursion, a function makes two or more recursive calls in a single execution. This creates a branching recursion pattern that can lead to exponential time complexity if not optimized properly.
-
-```java
-public class MultipleRecursion {
-    // Binary recursion - Fibonacci
-    public int fibonacci(int n) {
-        if (n <= 1) return n;
-        return fibonacci(n - 1) + fibonacci(n - 2);  // Two recursive calls
-    }
-    
-    // Multiple recursion - generate permutations
-    public List<List<Integer>> permute(int[] nums) {
-        List<List<Integer>> result = new ArrayList<>();
-        permuteHelper(nums, 0, result);
-        return result;
-    }
-    
-    private void permuteHelper(int[] nums, int start, List<List<Integer>> result) {
-        if (start == nums.length) {
-            List<Integer> permutation = new ArrayList<>();
-            for (int num : nums) {
-                permutation.add(num);
-            }
-            result.add(permutation);
-            return;
-        }
-        
-        for (int i = start; i < nums.length; i++) {
-            // Swap elements
-            swap(nums, start, i);
-            
-            // Recursive call - multiple recursion occurs through the loop
-            permuteHelper(nums, start + 1, result);
-            
-            // Backtrack
-            swap(nums, start, i);
-        }
-    }
-    
-    private void swap(int[] nums, int i, int j) {
-        int temp = nums[i];
-        nums[i] = nums[j];
-        nums[j] = temp;
-    }
-    
-    // Multiple recursion - Tower of Hanoi
-    public void towerOfHanoi(int n, char source, char auxiliary, char target) {
-        if (n == 1) {
-            System.out.println("Move disk 1 from " + source + " to " + target);
-            return;
-        }
-        
-        // Move n-1 disks from source to auxiliary
-        towerOfHanoi(n - 1, source, target, auxiliary);  // First recursive call
-        
-        // Move the nth disk from source to target
-        System.out.println("Move disk " + n + " from " + source + " to " + target);
-        
-        // Move n-1 disks from auxiliary to target
-        towerOfHanoi(n - 1, auxiliary, source, target);  // Second recursive call
-    }
-    
-    // Multiple recursion - binary tree traversal (postorder)
-    public List<Integer> postorderTraversal(TreeNode root) {
-        List<Integer> result = new ArrayList<>();
-        if (root == null) return result;
-        
-        // First recursive call for left subtree
-        result.addAll(postorderTraversal(root.left));
-        
-        // Second recursive call for right subtree
-        result.addAll(postorderTraversal(root.right));
-        
-        // Visit the root node
-        result.add(root.val);
-        
-        return result;
-    }
-}
-```
-
-##### Mathematical Analysis
-
-For multiple recursion:
-- **Time Complexity**: Often exponential, e.g., O(2^n) for binary recursion like Fibonacci
-- **Space Complexity**: O(n) for the call stack (depth), though total calls may be exponential
-- **Recurrence Relation**: Often in the form T(n) = aT(n-b) + O(f(n)) where a > 1
-
-The key challenge with multiple recursion is the exponential growth in the number of function calls. For example, with naive Fibonacci implementation, computing F(n) requires approximately 2^n function calls.
-
-#### Comparison of Time Complexity
-
-| Algorithm | Type | Time Complexity | Space Complexity | Number of Function Calls |
-|-----------|------|----------------|------------------|--------------------------|
-| Factorial | Linear | O(n) | O(n) | n |
-| Power | Linear | O(log n) | O(log n) | log n |
-| String Reversal | Linear | O(n) | O(n) | n |
-| Binary Search | Linear | O(log n) | O(log n) | log n |
-| Fibonacci (naive) | Multiple | O(2^n) | O(n) | ~2^n |
-| Tower of Hanoi | Multiple | O(2^n) | O(n) | 2^n - 1 |
-| Permutations | Multiple | O(n!) | O(n) | n! |
-| Tree Traversal | Multiple | O(n) | O(h) | n |
-
-#### Memoization for Multiple Recursion
-
-Because multiple recursion often involves redundant calculations, memoization can dramatically improve performance by storing previously computed results:
-
-```java
-public class MemoizedMultipleRecursion {
-    // Memoized Fibonacci
-    public int fibonacci(int n) {
-        // Initialize memoization table
-        Map<Integer, Integer> memo = new HashMap<>();
-        return fibMemoized(n, memo);
-    }
-    
-    private int fibMemoized(int n, Map<Integer, Integer> memo) {
-        // Base cases
-        if (n <= 1) return n;
-        
-        // Check if already computed
-        if (memo.containsKey(n)) {
-            return memo.get(n);
-        }
-        
-        // Compute and store result
-        int result = fibMemoized(n - 1, memo) + fibMemoized(n - 2, memo);
-        memo.put(n, result);
-        
-        return result;
-    }
-    
-    // With memoization, time complexity improves from O(2^n) to O(n)
-    // Space complexity is O(n) for both the call stack and memoization table
-}
-```
-
-The difference in efficiency is dramatic:
-- Computing F(40) with naive recursion would take billions of operations
-- Computing F(40) with memoization takes just ~40 operations
+| Type | Direct | Indirect | Tail | Non-tail |
+|------|---------|-----------|------|-----------|
+| **Call Pattern** | Self-call | Circular | Last operation | Pending operations |
+| **Stack Growth** | Linear | Linear | Constant (optimized) | Linear |
+| **Memory Usage** | O(n) | O(n) | O(1) | O(n) |
+| **Compiler Optimization** | Limited | Limited | Full | Limited |
+| **Use Cases** | Simple recursion | Complex systems | Performance critical | General purpose |
+| **Code Clarity** | High | Medium | High | Medium |
+| **Debugging** | Easy | Complex | Easy | Medium |
 
 ## Recursive Data Structures
 

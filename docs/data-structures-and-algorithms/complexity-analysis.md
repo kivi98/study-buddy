@@ -1184,9 +1184,7 @@ public class Stack {
         return top < 0;
     }
 }
-```
-
-**Analysis**:
+```**Analysis**:
 - Assign a charge of 2 to each push operation
 - Assign a charge of 0 to each pop operation (including pops in multiPop)
 - The extra credit from push operations pays for future pops
@@ -1232,9 +1230,7 @@ public class BinaryCounter {
         return value;
     }
 }
-```
-
-**Analysis**:
+```**Analysis**:
 - Define the potential function Φ as the number of 1s in the counter
 - The actual cost of an increment operation is proportional to the number of bits flipped
 - The change in potential is (new # of 1s) - (old # of 1s)
@@ -1489,9 +1485,7 @@ for (int i = 0; i < 10000; i++) {
         // Do something
     }
 }
-```
-
-### Optimization Problems
+```### Optimization Problems
 
 1. **Premature Optimization**
    - Optimizing before profiling to identify real bottlenecks
@@ -1771,3 +1765,8 @@ By mastering complexity analysis, you can:
 - [Algorithm Design Manual](http://www.algorist.com/) by Steven Skiena
 - [Algorithms](https://algs4.cs.princeton.edu/home/) by Robert Sedgewick and Kevin Wayne
 - [Competitive Programmer's Handbook](https://cses.fi/book/book.pdf) by Antti Laaksonen 
+
+
+
+
+
